@@ -1,4 +1,14 @@
 import erlang_template/chess/bitboard
+import erlang_template/chess/board
+import erlang_template/chess/color
+import erlang_template/chess/fen
+import erlang_template/chess/move
+import erlang_template/chess/move_gen
+import erlang_template/chess/move_tables
+import erlang_template/chess/square
+import gleam/int
+import gleam/io
+import gleam/list
 import gleeunit
 import gleeunit/should
 
@@ -35,4 +45,61 @@ pub fn bitboard_lsb_index_test() {
 
   bitboard.lsb_index(0b100000000000000000000000000000)
   |> should.equal(29)
+}
+
+pub fn bitboard_map_index_test() {
+  let indexes = bitboard.map_index(0b11010101, fn(i) { i })
+  let expected = [0, 2, 4, 6, 7]
+  indexes
+  |> list.zip(expected)
+  |> list.each(fn(testcase) { testcase.0 |> should.equal(testcase.1) })
+
+  let indexes = bitboard.map_index(0b1000010, fn(i) { i })
+  let expected = [1, 6]
+  indexes
+  |> list.zip(expected)
+  |> list.each(fn(testcase) { testcase.0 |> should.equal(testcase.1) })
+}
+
+pub fn move_new_test() {
+  let squares = [
+    #(square.A1, square.C6),
+    #(square.B1, square.H1),
+    #(square.H2, square.B6),
+    #(square.A1, square.H8),
+    #(square.H1, square.A8),
+    #(square.A8, square.H8),
+    #(square.H8, square.A8),
+  ]
+
+  use testcase <- list.each(squares)
+  testcase
+  |> fn(testcase) { move.new(testcase.0, testcase.1) }
+  |> fn(move) { #(move.source(move), move.target(move)) }
+  |> should.equal(testcase)
+}
+
+pub fn move_gen_knight_moves_test() {
+  let move_tables = move_tables.new_move_tables()
+  let board =
+    board.Board(
+      pieces: fen.pieces(fen.starting_fen),
+      color: color.White,
+      castling_rights: 0b1111,
+    )
+
+  let moves =
+    move_gen.knight_moves(board, move_tables) |> list.sort(int.compare)
+  let expected =
+    [
+      move.new(square.B1, square.A3),
+      move.new(square.B1, square.C3),
+      move.new(square.G1, square.H3),
+      move.new(square.G1, square.F3),
+    ]
+    |> list.sort(int.compare)
+
+  moves
+  |> list.zip(expected)
+  |> list.each(fn(testcase) { testcase.0 |> should.equal(testcase.1) })
 }

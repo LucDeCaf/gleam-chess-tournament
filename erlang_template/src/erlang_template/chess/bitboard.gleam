@@ -11,7 +11,7 @@ pub fn squares(bitboard: Bitboard) -> List(square.Square) {
   // Enforce 64-bit integer (no extra bits)
   bitboard
   |> int.bitwise_and(0xffffffffffffffff)
-  |> map(square.to_square_unchecked)
+  |> map(square.from_index_unchecked)
 }
 
 pub fn map(bitboard: Bitboard, with cb: fn(Int) -> b) -> List(b) {
@@ -25,6 +25,26 @@ fn map_inner(bitboard: Bitboard, cb: fn(Int) -> b, accum: List(b)) -> List(b) {
       let bitboard_minus_lsb = pop_lsb(bitboard)
       let i = { bitboard - int.bitwise_not(bitboard_minus_lsb) } / 2
       map_inner(bitboard_minus_lsb, cb, [cb(i), ..accum])
+    }
+  }
+}
+
+/// Map function where each value is the position of a set bit, starting from the LSB.
+pub fn map_index(bitboard: Bitboard, cb: fn(Int) -> b) -> List(b) {
+  map_index_inner(bitboard, cb, [])
+}
+
+pub fn map_index_inner(
+  bitboard: Bitboard,
+  cb: fn(Int) -> b,
+  accum: List(b),
+) -> List(b) {
+  case bitboard {
+    0 -> list.reverse(accum)
+    _ -> {
+      let bitboard_minus_lsb = pop_lsb(bitboard)
+      let new_lsb_index = lsb_index(bitboard)
+      map_index_inner(bitboard_minus_lsb, cb, [cb(new_lsb_index), ..accum])
     }
   }
 }

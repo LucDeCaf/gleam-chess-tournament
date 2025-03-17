@@ -3,12 +3,15 @@ import gleam/list
 import gleam/string
 import glearray
 
-const white_piece_chars = ["p", "n", "b", "r", "q", "k"]
+pub const starting_fen = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-const black_piece_chars = ["P", "N", "B", "R", "Q", "K"]
+const white_piece_chars = ["P", "N", "B", "R", "Q", "K"]
+
+const black_piece_chars = ["p", "n", "b", "r", "q", "k"]
 
 pub fn pieces(fen: String) -> glearray.Array(Int) {
-  fen
+  let assert Ok(pieces) = fen |> string.split(" ") |> list.first
+  pieces
   |> string.split("/")
   |> list.map(fn(line) {
     list.map(
@@ -26,9 +29,8 @@ pub fn pieces(fen: String) -> glearray.Array(Int) {
     )
   })
   |> list.fold([0, 0, 0, 0, 0, 0, 0, 0], fn(a, b) {
-    list.map(list.zip(a, b), fn(a) {
-      int.bitwise_or(int.bitwise_shift_left(a.0, 8), a.1)
-    })
+    list.zip(a, b)
+    |> list.map(fn(a) { int.bitwise_or(int.bitwise_shift_left(a.0, 8), a.1) })
   })
   |> glearray.from_list
 }
