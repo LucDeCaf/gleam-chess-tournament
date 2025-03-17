@@ -4,10 +4,8 @@ import erlang_template/chess/fen
 import erlang_template/chess/move
 import erlang_template/chess/move_gen
 import erlang_template/chess/move_tables
-import erlang_template/chess/square
 import gleam/dynamic/decode
 import gleam/list
-import gleam/result
 
 pub fn player_decoder() {
   use player_string <- decode.then(decode.string)

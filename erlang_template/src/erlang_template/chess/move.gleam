@@ -1,8 +1,5 @@
-import erlang_template/chess/piece
 import erlang_template/chess/square
 import gleam/int
-import gleam/io
-import gleam/string
 
 const from_mask = 0b1111110000000000
 
