@@ -7,9 +7,7 @@ import erlang_template/chess/move_gen
 import erlang_template/chess/move_tables
 import erlang_template/chess/square
 import gleam/int
-import gleam/io
 import gleam/list
-import gleam/string
 import gleeunit
 import gleeunit/should
 
