@@ -43,3 +43,16 @@ pub fn knight_moves(
   })
   |> list.flatten
 }
+
+pub fn bishop_moves(board: board.Board, move_tables: move_tables.MoveTables) {
+  let bishops = board.bitboard(board, piece.Bishop, board.color)
+  let friendly_pieces = board.color_bitboard(board, board.color)
+  let not_friendly_pieces = int.bitwise_not(friendly_pieces)
+
+  bishops
+  |> bitboard.map_index(fn(source_i) {
+    let source_square = source_i |> square.from_index_unchecked
+    todo
+  })
+  |> list.flatten
+}

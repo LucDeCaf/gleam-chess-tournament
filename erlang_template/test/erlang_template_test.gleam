@@ -7,7 +7,9 @@ import erlang_template/chess/move_gen
 import erlang_template/chess/move_tables
 import erlang_template/chess/square
 import gleam/int
+import gleam/io
 import gleam/list
+import gleam/string
 import gleeunit
 import gleeunit/should
 
@@ -101,4 +103,24 @@ pub fn move_gen_knight_moves_test() {
   moves
   |> list.zip(expected)
   |> list.each(fn(testcase) { testcase.0 |> should.equal(testcase.1) })
+}
+
+pub fn move_gen_sliding_targets_test() {
+  let rook_shifts = [-1, 1, -8, 8]
+  let bishop_shifts = [-7, 7, -9, 9]
+
+  let blockers = 9_304_438_067_099_336_704
+  let square = square.from_index_unchecked(45)
+
+  let expected_bishop_moves = 22_518_341_868_716_032
+  let expected_rook_moves = 9_110_690_786_705_408
+
+  move_tables.sliding_targets(square, blockers, rook_shifts)
+  |> should.equal(expected_rook_moves)
+  move_tables.sliding_targets(square, blockers, bishop_shifts)
+  |> should.equal(expected_bishop_moves)
+  // let square = square.A1
+  // let expected_rook_moves = 1103823438206 
+  // move_gen.sliding_targets(square, blockers, rook_shifts)
+  // |> should.equal(expected_rook_moves)
 }

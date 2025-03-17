@@ -14,11 +14,11 @@ pub fn squares(bitboard: Bitboard) -> List(square.Square) {
   |> map(square.from_index_unchecked)
 }
 
-pub fn map(bitboard: Bitboard, with cb: fn(Int) -> b) -> List(b) {
+pub fn map(bitboard: Bitboard, with cb: fn(Int) -> a) -> List(a) {
   map_inner(bitboard, cb, [])
 }
 
-fn map_inner(bitboard: Bitboard, cb: fn(Int) -> b, accum: List(b)) -> List(b) {
+fn map_inner(bitboard: Bitboard, cb: fn(Int) -> a, accum: List(a)) -> List(a) {
   case bitboard {
     0 -> list.reverse(accum)
     _ -> {
@@ -30,15 +30,15 @@ fn map_inner(bitboard: Bitboard, cb: fn(Int) -> b, accum: List(b)) -> List(b) {
 }
 
 /// Map function where each value is the position of a set bit, starting from the LSB.
-pub fn map_index(bitboard: Bitboard, cb: fn(Int) -> b) -> List(b) {
+pub fn map_index(bitboard: Bitboard, cb: fn(Int) -> a) -> List(a) {
   map_index_inner(bitboard, cb, [])
 }
 
 pub fn map_index_inner(
   bitboard: Bitboard,
-  cb: fn(Int) -> b,
-  accum: List(b),
-) -> List(b) {
+  cb: fn(Int) -> a,
+  accum: List(a),
+) -> List(a) {
   case bitboard {
     0 -> list.reverse(accum)
     _ -> {
@@ -46,6 +46,23 @@ pub fn map_index_inner(
       let new_lsb_index = lsb_index(bitboard)
       map_index_inner(bitboard_minus_lsb, cb, [cb(new_lsb_index), ..accum])
     }
+  }
+}
+
+pub fn map_subsets(bitboard: Bitboard, cb: fn(Bitboard) -> a) -> List(a) {
+  map_subsets_inner(0, bitboard, cb, [cb(0)])
+}
+
+pub fn map_subsets_inner(
+  bitboard: Bitboard,
+  first: Bitboard,
+  cb: fn(Bitboard) -> a,
+  accum: List(a),
+) -> List(a) {
+  let bitboard = int.bitwise_and(bitboard - first, first)
+  case bitboard {
+    0 -> list.reverse(accum)
+    _ -> map_subsets_inner(bitboard, first, cb, [cb(bitboard), ..accum])
   }
 }
 
