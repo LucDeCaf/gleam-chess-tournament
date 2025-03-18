@@ -7,6 +7,7 @@ import erlang_template/chess/fen
 import gleam/int
 import gleam/list
 import gleam/option.{type Option, None, Some}
+import gleam/result
 import glearray
 
 pub type Board {
@@ -34,56 +35,19 @@ pub fn all_pieces(board: Board) {
   int.bitwise_or(white, black)
 }
 
-// TODO: What the fuck is this
-pub fn piece_at(
-  board: Board,
-  square square: square.Square,
-) -> Option(piece.Piece) {
-  let mask = square |> square.index |> bitboard.from_index
-  let pawns = board |> piece_bitboard(piece.Pawn) |> int.bitwise_and(mask)
-  case pawns != 0 {
-    True -> Some(piece.Pawn)
-    False -> {
-      let knights =
-        board |> piece_bitboard(piece.Knight) |> int.bitwise_and(mask)
-      case knights != 0 {
-        True -> Some(piece.Knight)
-        False -> {
-          let bishops =
-            board |> piece_bitboard(piece.Bishop) |> int.bitwise_and(mask)
-          case bishops != 0 {
-            True -> Some(piece.Bishop)
-            False -> {
-              let rooks =
-                board |> piece_bitboard(piece.Rook) |> int.bitwise_and(mask)
-              case rooks != 0 {
-                True -> Some(piece.Rook)
-                False -> {
-                  let queens =
-                    board
-                    |> piece_bitboard(piece.Queen)
-                    |> int.bitwise_and(mask)
-                  case queens != 0 {
-                    True -> Some(piece.Queen)
-                    False -> {
-                      let kings =
-                        board
-                        |> piece_bitboard(piece.King)
-                        |> int.bitwise_and(mask)
-                      case kings != 0 {
-                        True -> Some(piece.King)
-                        False -> None
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
+// TODO: Tests
+pub fn piece_at(board: Board, square: square.Square) {
+  let mask = square |> square.bitboard
+  board.pieces
+  |> glearray.to_list
+  |> list.index_map(fn(bitboard, i) {
+    case bitboard |> int.bitwise_and(mask) {
+      0 -> None
+      _ -> piece.from_index(i) |> option.from_result
     }
-  }
+  })
+  |> list.find(option.is_some)
+  |> result.unwrap(or: None)
 }
 
 pub fn bitboard(board: Board, piece: piece.Piece, color: color.Color) {

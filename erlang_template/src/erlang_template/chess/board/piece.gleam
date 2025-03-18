@@ -18,4 +18,16 @@ pub fn index(piece) {
   }
 }
 
+pub fn from_index(i) {
+  case i {
+    0 -> Ok(Pawn)
+    1 -> Ok(Knight)
+    2 -> Ok(Bishop)
+    3 -> Ok(Rook)
+    4 -> Ok(Queen)
+    5 -> Ok(King)
+    _ -> Error(Nil)
+  }
+}
+
 pub const valid_promotion_pieces = [Knight, Bishop, Rook, Queen]
