@@ -1,11 +1,7 @@
 import erlang_template/chess/bitboard
-import erlang_template/chess/board
 import erlang_template/chess/color
 import erlang_template/chess/magics.{MagicEntry}
-import erlang_template/chess/move
-import erlang_template/chess/piece
 import erlang_template/chess/square
-import gleam/bit_array
 import gleam/int
 import gleam/list
 import glearray

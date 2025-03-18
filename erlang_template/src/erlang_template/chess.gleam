@@ -5,7 +5,6 @@ import erlang_template/chess/move
 import erlang_template/chess/move_gen
 import erlang_template/chess/move_tables
 import gleam/dynamic/decode
-import gleam/erlang
 import gleam/list
 
 pub fn player_decoder() {
