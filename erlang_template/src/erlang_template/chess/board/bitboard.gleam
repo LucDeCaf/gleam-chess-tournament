@@ -11,6 +11,10 @@ pub fn squares(bitboard: Int) -> List(square.Square) {
   |> map(square.from_index_unchecked)
 }
 
+pub fn from_index(i: Int) -> Int {
+  int.bitwise_shift_left(1, i)
+}
+
 pub fn map(bitboard: Int, with cb: fn(Int) -> a) -> List(a) {
   map_inner(bitboard, cb, [])
 }

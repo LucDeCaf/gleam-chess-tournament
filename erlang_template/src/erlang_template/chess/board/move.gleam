@@ -1,3 +1,4 @@
+import erlang_template/chess/board/flags
 import erlang_template/chess/board/square
 import gleam/int
 
@@ -10,7 +11,7 @@ const flags_mask = 0b0000000000001111
 pub type Move =
   Int
 
-pub fn new(from from: square.Square, to to: square.Square) {
+pub fn new(from: square.Square, to: square.Square, flags: flags.Flags) {
   let from_mask =
     square.index(from)
     |> int.bitwise_shift_left(10)
@@ -19,9 +20,7 @@ pub fn new(from from: square.Square, to to: square.Square) {
     square.index(to)
     |> int.bitwise_shift_left(4)
     |> int.bitwise_and(to_mask)
-
-  // TODO: Decide on move flags
-  let flags_mask = 0
+  let flags_mask = flags |> int.bitwise_and(flags_mask)
 
   from_mask |> int.bitwise_or(to_mask) |> int.bitwise_or(flags_mask)
 }

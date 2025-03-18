@@ -1,14 +1,16 @@
 import erlang_template/chess/board
 import erlang_template/chess/board/bitboard
 import erlang_template/chess/board/color
+import erlang_template/chess/board/flags
 import erlang_template/chess/board/move
+import erlang_template/chess/board/piece
 import erlang_template/chess/board/square
 import erlang_template/chess/fen
 import erlang_template/chess/move_gen
 import erlang_template/chess/move_gen/move_tables
 import gleam/int
 import gleam/list
-import gleam/option
+import gleam/option.{None, Some}
 import gleeunit
 import gleeunit/should
 
@@ -77,7 +79,7 @@ pub fn move_new_test() {
 
   use testcase <- list.each(squares)
   testcase
-  |> fn(testcase) { move.new(testcase.0, testcase.1) }
+  |> fn(testcase) { move.new(testcase.0, testcase.1, 0) }
   |> fn(move) { #(move.source(move), move.target(move)) }
   |> should.equal(testcase)
 }
@@ -89,17 +91,17 @@ pub fn move_gen_knight_moves_test() {
       pieces: fen.pieces(fen.starting_fen),
       color: color.White,
       castling_rights: 0b1111,
-      en_passant: option.None,
+      en_passant: None,
     )
 
   let moves =
     move_gen.knight_moves(board, move_tables) |> list.sort(int.compare)
   let expected =
     [
-      move.new(square.B1, square.A3),
-      move.new(square.B1, square.C3),
-      move.new(square.G1, square.H3),
-      move.new(square.G1, square.F3),
+      move.new(square.B1, square.A3, 0),
+      move.new(square.B1, square.C3, 0),
+      move.new(square.G1, square.H3, 0),
+      move.new(square.G1, square.F3, 0),
     ]
     |> list.sort(int.compare)
 
@@ -161,27 +163,27 @@ pub fn move_gen_pawn_moves_test() {
       pieces: fen.pieces(fen.starting_fen),
       color: color.White,
       castling_rights: 0b1111,
-      en_passant: option.None,
+      en_passant: None,
     )
   let moves = move_gen.pawn_straight_moves(board) |> list.sort(int.compare)
   let expected_moves =
     [
-      move.new(square.A2, square.A3),
-      move.new(square.A2, square.A4),
-      move.new(square.B2, square.B3),
-      move.new(square.B2, square.B4),
-      move.new(square.C2, square.C3),
-      move.new(square.C2, square.C4),
-      move.new(square.D2, square.D3),
-      move.new(square.D2, square.D4),
-      move.new(square.E2, square.E3),
-      move.new(square.E2, square.E4),
-      move.new(square.F2, square.F3),
-      move.new(square.F2, square.F4),
-      move.new(square.G2, square.G3),
-      move.new(square.G2, square.G4),
-      move.new(square.H2, square.H3),
-      move.new(square.H2, square.H4),
+      move.new(square.A2, square.A3, 0),
+      move.new(square.A2, square.A4, flags.double_move),
+      move.new(square.B2, square.B3, 0),
+      move.new(square.B2, square.B4, flags.double_move),
+      move.new(square.C2, square.C3, 0),
+      move.new(square.C2, square.C4, flags.double_move),
+      move.new(square.D2, square.D3, 0),
+      move.new(square.D2, square.D4, flags.double_move),
+      move.new(square.E2, square.E3, 0),
+      move.new(square.E2, square.E4, flags.double_move),
+      move.new(square.F2, square.F3, 0),
+      move.new(square.F2, square.F4, flags.double_move),
+      move.new(square.G2, square.G3, 0),
+      move.new(square.G2, square.G4, flags.double_move),
+      move.new(square.H2, square.H3, 0),
+      move.new(square.H2, square.H4, flags.double_move),
     ]
     |> list.sort(int.compare)
 
@@ -201,7 +203,7 @@ pub fn move_gen_pawn_captures_test() {
       pieces: fen.pieces(pawn_test_fen),
       color: color.White,
       castling_rights: 0b1111,
-      en_passant: option.Some(square.D6),
+      en_passant: Some(square.D6),
     )
   let move_tables = move_tables.new()
 
@@ -209,11 +211,11 @@ pub fn move_gen_pawn_captures_test() {
     move_gen.pawn_captures(board, move_tables) |> list.sort(int.compare)
   let expected_moves =
     [
-      move.new(square.C5, square.D6),
-      move.new(square.E5, square.D6),
-      move.new(square.E5, square.F6),
-      move.new(square.A2, square.B3),
-      move.new(square.G2, square.H3),
+      move.new(square.C5, square.D6, flags.new(None, True, flags.en_passant)),
+      move.new(square.E5, square.D6, flags.new(None, True, flags.en_passant)),
+      move.new(square.E5, square.F6, flags.capture),
+      move.new(square.A2, square.B3, flags.capture),
+      move.new(square.G2, square.H3, flags.capture),
     ]
     |> list.sort(int.compare)
 
@@ -225,18 +227,18 @@ pub fn move_gen_pawn_captures_test() {
       pieces: fen.pieces(pawn_test_fen),
       color: color.Black,
       castling_rights: 0b1111,
-      en_passant: option.Some(square.E4),
+      en_passant: Some(square.E4),
     )
 
   let moves =
     move_gen.pawn_captures(board, move_tables) |> list.sort(int.compare)
   let expected_moves =
     [
-      move.new(square.A7, square.B6),
-      move.new(square.C7, square.B6),
-      move.new(square.B3, square.A2),
-      move.new(square.D5, square.E4),
-      move.new(square.F6, square.E5),
+      move.new(square.A7, square.B6, flags.capture),
+      move.new(square.C7, square.B6, flags.capture),
+      move.new(square.B3, square.A2, flags.capture),
+      move.new(square.D5, square.E4, flags.new(None, True, flags.en_passant)),
+      move.new(square.F6, square.E5, flags.capture),
     ]
     |> list.sort(int.compare)
 
@@ -250,4 +252,17 @@ pub fn move_gen_pawn_captures_test() {
   //   <> move.to_debug_string(testcase.0),
   // )
   testcase.0 |> should.equal(testcase.1)
+}
+
+pub fn flags_new_test() {
+  flags.new(None, False, 0) |> should.equal(0b0000)
+  flags.new(None, True, 0) |> should.equal(0b0100)
+  flags.new(Some(piece.Knight), True, 0) |> should.equal(0b1100)
+  flags.new(Some(piece.Bishop), True, 0) |> should.equal(0b1101)
+  flags.new(Some(piece.Rook), True, 0) |> should.equal(0b1110)
+  flags.new(Some(piece.Queen), True, 0) |> should.equal(0b1111)
+  flags.new(Some(piece.Knight), False, 0) |> should.equal(0b1000)
+  flags.new(Some(piece.Bishop), False, 0) |> should.equal(0b1001)
+  flags.new(Some(piece.Rook), False, 0) |> should.equal(0b1010)
+  flags.new(Some(piece.Queen), False, 0) |> should.equal(0b1011)
 }
