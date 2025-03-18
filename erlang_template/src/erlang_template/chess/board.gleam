@@ -119,7 +119,7 @@ pub fn make_move(on board: Board, play move: move.Move) -> Board {
       let file_diff = int.absolute_value(file_start - file_end)
 
       case moved_piece == piece.King && file_diff == 2 {
-        True -> handle_castle(board, source, target)
+        True -> handle_castle(board, target)
 
         False -> {
           case board.en_passant {
@@ -232,14 +232,49 @@ fn handle_promotion(
   )
 }
 
-// TODO: Move handlers
+// TODO: Tests
+fn handle_castle(board: Board, target: square.Square) -> Board {
+  let #(source, rook_mask, removed_castling_right) = case target {
+    square.G1 -> #(square.E1, 0xa0, 0b0001)
+    square.C1 -> #(square.E1, 0x9, 0b0010)
+    square.G8 -> #(square.E8, 0xa000000000000000, 0b0100)
+    square.C8 -> #(square.E8, 0x900000000000000, 0b1000)
+    _ -> panic as { "invalid castling target: " <> square.to_string(target) }
+  }
 
-fn handle_castle(
-  board: Board,
-  source: square.Square,
-  target: square.Square,
-) -> Board {
-  todo
+  let king_mask =
+    int.bitwise_or(source |> square.bitboard, target |> square.bitboard)
+
+  let friendly_color_mask = rook_mask |> int.bitwise_or(king_mask)
+
+  let friendly_bb_index = case board.color {
+    color.White -> 6
+    color.Black -> 7
+  }
+
+  let pieces =
+    board.pieces
+    |> glearray.to_list
+    |> list.index_map(fn(bitboard, i) {
+      case i {
+        3 -> bitboard |> int.bitwise_exclusive_or(rook_mask)
+        5 -> bitboard |> int.bitwise_exclusive_or(king_mask)
+        i if i == friendly_bb_index ->
+          bitboard |> int.bitwise_exclusive_or(friendly_color_mask)
+        _ -> bitboard
+      }
+    })
+    |> glearray.from_list
+
+  let castling_rights =
+    board.castling_rights |> int.bitwise_exclusive_or(removed_castling_right)
+
+  Board(
+    pieces: pieces,
+    color: board.color |> color.inverse,
+    castling_rights: castling_rights,
+    en_passant: None,
+  )
 }
 
 fn handle_en_passant(
@@ -247,7 +282,49 @@ fn handle_en_passant(
   source: square.Square,
   target: square.Square,
 ) -> Board {
-  todo
+  let target_i = target |> square.index
+  let source_bb = source |> square.bitboard
+  let target_bb = target |> square.bitboard
+
+  let captured_pawn_i = case board.color {
+    color.White -> target_i - 8
+    color.Black -> target_i + 8
+  }
+  let captured_pawn_bb = bitboard.from_index(captured_pawn_i)
+
+  let pawn_mask =
+    source_bb
+    |> int.bitwise_or(target_bb)
+    |> int.bitwise_or(captured_pawn_bb)
+  let friendly_color_mask = source_bb |> int.bitwise_or(target_bb)
+  let enemy_color_mask = captured_pawn_bb
+
+  let #(friendly_bb_index, enemy_bb_index) = case board.color {
+    color.White -> #(6, 7)
+    color.Black -> #(7, 6)
+  }
+
+  let pieces =
+    board.pieces
+    |> glearray.to_list
+    |> list.index_map(fn(bitboard, i) {
+      case i {
+        0 -> int.bitwise_exclusive_or(bitboard, pawn_mask)
+        i if i == friendly_bb_index ->
+          int.bitwise_exclusive_or(bitboard, friendly_color_mask)
+        i if i == enemy_bb_index ->
+          int.bitwise_exclusive_or(bitboard, enemy_color_mask)
+        _ -> bitboard
+      }
+    })
+    |> glearray.from_list
+
+  Board(
+    pieces: pieces,
+    color: board.color |> color.inverse,
+    castling_rights: board.castling_rights,
+    en_passant: None,
+  )
 }
 
 fn handle_normal_move(
