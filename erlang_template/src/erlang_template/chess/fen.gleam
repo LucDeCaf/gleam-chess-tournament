@@ -1,4 +1,4 @@
-import erlang_template/chess/square
+import erlang_template/chess/board/square
 import gleam/int
 import gleam/list
 import gleam/option

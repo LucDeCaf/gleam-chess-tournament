@@ -1,9 +1,9 @@
 import erlang_template/chess/board
-import erlang_template/chess/color
+import erlang_template/chess/board/color
+import erlang_template/chess/board/move
 import erlang_template/chess/fen
-import erlang_template/chess/move
 import erlang_template/chess/move_gen
-import erlang_template/chess/move_tables
+import erlang_template/chess/move_gen/move_tables
 import gleam/dynamic/decode
 import gleam/list
 

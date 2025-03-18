@@ -1,11 +1,11 @@
-import erlang_template/chess/bitboard
 import erlang_template/chess/board
-import erlang_template/chess/color
+import erlang_template/chess/board/bitboard
+import erlang_template/chess/board/color
+import erlang_template/chess/board/move
+import erlang_template/chess/board/square
 import erlang_template/chess/fen
-import erlang_template/chess/move
 import erlang_template/chess/move_gen
-import erlang_template/chess/move_tables
-import erlang_template/chess/square
+import erlang_template/chess/move_gen/move_tables
 import gleam/int
 import gleam/list
 import gleam/option

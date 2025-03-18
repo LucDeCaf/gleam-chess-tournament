@@ -1,7 +1,7 @@
-import erlang_template/chess/color
-import erlang_template/chess/move
-import erlang_template/chess/piece
-import erlang_template/chess/square
+import erlang_template/chess/board/color
+import erlang_template/chess/board/move
+import erlang_template/chess/board/piece
+import erlang_template/chess/board/square
 import gleam/int
 import gleam/option
 import glearray

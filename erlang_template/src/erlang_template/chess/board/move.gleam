@@ -1,4 +1,4 @@
-import erlang_template/chess/square
+import erlang_template/chess/board/square
 import gleam/int
 
 const from_mask = 0b1111110000000000
