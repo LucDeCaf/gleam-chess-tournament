@@ -974,11 +974,10 @@ pub fn bishop_targets(
   move_tables: MoveTables,
 ) -> Int {
   let i = square |> square.index
-  let assert Ok(magic) =
-    move_tables.bishop_magics |> glearray.get(i) |> io.debug
-  let assert Ok(moves) = move_tables.bishop_moves |> glearray.get(i) |> io.debug
+  let assert Ok(magic) = move_tables.bishop_magics |> glearray.get(i)
+  let assert Ok(moves) = move_tables.bishop_moves |> glearray.get(i)
   let assert Ok(targets) =
-    moves |> glearray.get(magics.magic_index(magic, blockers)) |> io.debug
+    moves |> glearray.get(magics.magic_index(magic, blockers))
   targets
 }
 

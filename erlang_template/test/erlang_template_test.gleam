@@ -126,11 +126,14 @@ pub fn move_gen_sliding_targets_test() {
 
 pub fn move_gen_bishop_targets_test() {
   let move_tables = move_tables.new()
-
   let blockers = 9_304_438_067_099_336_704
   let square = square.from_index_unchecked(45)
-  let expected_moves = 22_518_341_868_716_032
+
+  let expected_bishop_moves = 22_518_341_868_716_032
+  let expected_rook_moves = 9_110_690_786_705_408
 
   move_tables.bishop_targets(square, blockers, move_tables)
-  |> should.equal(expected_moves)
+  |> should.equal(expected_bishop_moves)
+  move_tables.rook_targets(square, blockers, move_tables)
+  |> should.equal(expected_rook_moves)
 }

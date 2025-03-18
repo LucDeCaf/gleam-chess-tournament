@@ -59,3 +59,22 @@ pub fn bishop_moves(board: board.Board, move_tables: move_tables.MoveTables) {
   })
   |> list.flatten
 }
+
+pub fn rook_moves(board: board.Board, move_tables: move_tables.MoveTables) {
+  let rooks = board.bitboard(board, piece.Rook, board.color)
+  let blockers = board.all_pieces(board)
+
+  bitboard.map_index(rooks, fn(source_i) {
+    let source_square = source_i |> square.from_index_unchecked
+    let targets = move_tables.rook_targets(source_square, blockers, move_tables)
+
+    use target_i <- bitboard.map_index(targets)
+    let target_square = square.from_index_unchecked(target_i)
+    move.new(source_square, target_square)
+  })
+  |> list.flatten
+}
+
+pub fn queen_moves(board: board.Board, move_tables: move_tables.MoveTables) {
+  list.append(rook_moves(board, move_tables), bishop_moves(board, move_tables))
+}
