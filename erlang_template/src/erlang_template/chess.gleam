@@ -5,6 +5,7 @@ import erlang_template/chess/move
 import erlang_template/chess/move_gen
 import erlang_template/chess/move_tables
 import gleam/dynamic/decode
+import gleam/erlang
 import gleam/list
 
 pub fn player_decoder() {
@@ -23,7 +24,12 @@ pub fn move(
 ) -> Result(String, String) {
   let move_tables = move_tables.new()
   let board =
-    board.Board(pieces: fen.pieces(fen), color: turn, castling_rights: 0b1111)
+    board.Board(
+      pieces: fen.pieces(fen),
+      color: turn,
+      castling_rights: 0b1111,
+      en_passant: fen.en_passant(fen),
+    )
 
   let moves = move_gen.legal_moves(board, move_tables)
 

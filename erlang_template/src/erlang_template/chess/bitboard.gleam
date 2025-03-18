@@ -31,11 +31,7 @@ pub fn map_index(bitboard: Int, cb: fn(Int) -> a) -> List(a) {
   map_index_inner(force_u64(bitboard), cb, [])
 }
 
-fn map_index_inner(
-  bitboard: Int,
-  cb: fn(Int) -> a,
-  accum: List(a),
-) -> List(a) {
+fn map_index_inner(bitboard: Int, cb: fn(Int) -> a, accum: List(a)) -> List(a) {
   case bitboard {
     0 -> list.reverse(accum)
     _ -> {

@@ -1,8 +1,12 @@
 import erlang_template/chess/bitboard
+import erlang_template/chess/board
+import erlang_template/chess/color
 import erlang_template/chess/magics.{MagicEntry}
+import erlang_template/chess/move
+import erlang_template/chess/piece
 import erlang_template/chess/square
+import gleam/bit_array
 import gleam/int
-import gleam/io
 import gleam/list
 import glearray
 import iv
@@ -1031,9 +1035,9 @@ fn remove_edges(mask: Int, start: Int) {
       // apply only 8th rank filter
       0 -> 0xff00000000000000
       // apply only 1st rank filter
-      7 -> 0xff
+      7 -> 0x00000000000000ff
       // apply both
-      _ -> int.bitwise_or(0xff, 0xff00000000000000)
+      _ -> int.bitwise_or(0x00000000000000ff, 0xff00000000000000)
     }),
   )
   |> int.bitwise_and(
@@ -1041,9 +1045,33 @@ fn remove_edges(mask: Int, start: Int) {
       // apply only H file filter
       0 -> 0x8080808080808080
       // apply only A file filter
-      7 -> 0x101010101010101
+      7 -> 0x0101010101010101
       // apply both
-      _ -> int.bitwise_or(0x101010101010101, 0x8080808080808080)
+      _ -> int.bitwise_or(0x0101010101010101, 0x8080808080808080)
     }),
   )
+}
+
+pub fn en_passant_source_masks(
+  target: square.Square,
+  attacking_color: color.Color,
+  move_tables: MoveTables,
+) {
+  let i = square.index(target)
+  let mask = case attacking_color {
+    color.White ->
+      int.bitwise_or(
+        1 |> int.bitwise_shift_left(i - 7),
+        1 |> int.bitwise_shift_left(i - 9),
+      )
+    color.Black ->
+      int.bitwise_or(
+        1 |> int.bitwise_shift_left(i + 7),
+        1 |> int.bitwise_shift_left(i + 9),
+      )
+  }
+
+  // Prevent wrapping by AND'ing with the square's king mask
+  let assert Ok(neighbours) = move_tables.king_table |> glearray.get(i)
+  mask |> int.bitwise_and(neighbours)
 }

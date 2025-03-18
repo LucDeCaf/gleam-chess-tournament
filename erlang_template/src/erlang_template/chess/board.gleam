@@ -1,11 +1,18 @@
 import erlang_template/chess/color
 import erlang_template/chess/move
 import erlang_template/chess/piece
+import erlang_template/chess/square
 import gleam/int
+import gleam/option
 import glearray
 
 pub type Board {
-  Board(pieces: glearray.Array(Int), color: color.Color, castling_rights: Int)
+  Board(
+    pieces: glearray.Array(Int),
+    color: color.Color,
+    castling_rights: Int,
+    en_passant: option.Option(square.Square),
+  )
 }
 
 pub fn piece_bitboard(board: Board, piece: piece.Piece) {

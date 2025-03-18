@@ -1,5 +1,7 @@
+import erlang_template/chess/square
 import gleam/int
 import gleam/list
+import gleam/option
 import gleam/string
 import glearray
 
@@ -98,4 +100,10 @@ fn get_piece(
         _ -> #(position + 1, piece_chars |> list.contains(any: char))
       }
   }
+}
+
+pub fn en_passant(fen: String) -> option.Option(square.Square) {
+  let assert Ok(ep_string) =
+    fen |> string.split(" ") |> list.take(4) |> list.last
+  option.from_result(square.from_string(ep_string))
 }

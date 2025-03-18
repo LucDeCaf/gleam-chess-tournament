@@ -8,12 +8,16 @@ import erlang_template/chess/move_tables
 import erlang_template/chess/square
 import gleam/int
 import gleam/list
+import gleam/option
 import gleeunit
 import gleeunit/should
 
 pub fn main() {
   gleeunit.main()
 }
+
+// Custom fen with many pawn captures / moves
+const pawn_test_fen = "rnbqkb1r/p1p1pppp/8/2PpP3/8/1p3P1n/PP1P2PP/RNBQKBNR w KQkq - 0 1"
 
 pub fn bitboard_pop_lsb_test() {
   bitboard.pop_lsb(0b00101100)
@@ -85,6 +89,7 @@ pub fn move_gen_knight_moves_test() {
       pieces: fen.pieces(fen.starting_fen),
       color: color.White,
       castling_rights: 0b1111,
+      en_passant: option.None,
     )
 
   let moves =
@@ -136,4 +141,113 @@ pub fn move_gen_bishop_targets_test() {
   |> should.equal(expected_bishop_moves)
   move_tables.rook_targets(square, blockers, move_tables)
   |> should.equal(expected_rook_moves)
+}
+
+pub fn move_tables_en_passant_source_mask_test() {
+  let move_tables = move_tables.new()
+  move_tables.en_passant_source_masks(square.E3, color.Black, move_tables)
+  |> should.equal(0x28000000)
+  move_tables.en_passant_source_masks(square.D6, color.White, move_tables)
+  |> should.equal(0x1400000000)
+  move_tables.en_passant_source_masks(square.H6, color.White, move_tables)
+  |> should.equal(0x4000000000)
+  move_tables.en_passant_source_masks(square.H6, color.Black, move_tables)
+  |> should.equal(0x40000000000000)
+}
+
+pub fn move_gen_pawn_moves_test() {
+  let board =
+    board.Board(
+      pieces: fen.pieces(fen.starting_fen),
+      color: color.White,
+      castling_rights: 0b1111,
+      en_passant: option.None,
+    )
+  let moves = move_gen.pawn_straight_moves(board) |> list.sort(int.compare)
+  let expected_moves =
+    [
+      move.new(square.A2, square.A3),
+      move.new(square.A2, square.A4),
+      move.new(square.B2, square.B3),
+      move.new(square.B2, square.B4),
+      move.new(square.C2, square.C3),
+      move.new(square.C2, square.C4),
+      move.new(square.D2, square.D3),
+      move.new(square.D2, square.D4),
+      move.new(square.E2, square.E3),
+      move.new(square.E2, square.E4),
+      move.new(square.F2, square.F3),
+      move.new(square.F2, square.F4),
+      move.new(square.G2, square.G3),
+      move.new(square.G2, square.G4),
+      move.new(square.H2, square.H3),
+      move.new(square.H2, square.H4),
+    ]
+    |> list.sort(int.compare)
+
+  use testcase <- list.each(list.zip(moves, expected_moves))
+  // io.debug(
+  //   "expected "
+  //   <> move.to_debug_string(testcase.1)
+  //   <> ", got "
+  //   <> move.to_debug_string(testcase.0),
+  // )
+  testcase.0 |> should.equal(testcase.1)
+}
+
+pub fn move_gen_pawn_captures_test() {
+  let board =
+    board.Board(
+      pieces: fen.pieces(pawn_test_fen),
+      color: color.White,
+      castling_rights: 0b1111,
+      en_passant: option.Some(square.D6),
+    )
+  let move_tables = move_tables.new()
+
+  let moves =
+    move_gen.pawn_captures(board, move_tables) |> list.sort(int.compare)
+  let expected_moves =
+    [
+      move.new(square.C5, square.D6),
+      move.new(square.E5, square.D6),
+      move.new(square.E5, square.F6),
+      move.new(square.A2, square.B3),
+      move.new(square.G2, square.H3),
+    ]
+    |> list.sort(int.compare)
+
+  let white_testcases = list.zip(moves, expected_moves)
+
+  // Update EP square and test with black pawns
+  let board =
+    board.Board(
+      pieces: fen.pieces(pawn_test_fen),
+      color: color.Black,
+      castling_rights: 0b1111,
+      en_passant: option.Some(square.E4),
+    )
+
+  let moves =
+    move_gen.pawn_captures(board, move_tables) |> list.sort(int.compare)
+  let expected_moves =
+    [
+      move.new(square.A7, square.B6),
+      move.new(square.C7, square.B6),
+      move.new(square.B3, square.A2),
+      move.new(square.D5, square.E4),
+      move.new(square.F6, square.E5),
+    ]
+    |> list.sort(int.compare)
+
+  let black_testcases = list.zip(moves, expected_moves)
+
+  use testcase <- list.each(list.append(white_testcases, black_testcases))
+  // io.debug(
+  //   "expected "
+  //   <> move.to_debug_string(testcase.1)
+  //   <> ", got "
+  //   <> move.to_debug_string(testcase.0),
+  // )
+  testcase.0 |> should.equal(testcase.1)
 }
