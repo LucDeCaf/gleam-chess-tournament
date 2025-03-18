@@ -266,3 +266,4 @@ pub fn flags_new_test() {
   flags.new(Some(piece.Rook), False, 0) |> should.equal(0b1010)
   flags.new(Some(piece.Queen), False, 0) |> should.equal(0b1011)
 }
+// TODO: More exhaustive double pawn move tests
