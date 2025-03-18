@@ -253,5 +253,4 @@ pub fn pawn_captures(
     None -> moves
   }
 }
-
 // TODO: Castling

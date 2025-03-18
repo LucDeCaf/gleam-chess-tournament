@@ -3,7 +3,7 @@ import erlang_template/chess/board/move
 import erlang_template/chess/board/piece
 import erlang_template/chess/board/square
 import gleam/int
-import gleam/option
+import gleam/option.{type Option}
 import glearray
 
 pub type Board {
@@ -11,7 +11,7 @@ pub type Board {
     pieces: glearray.Array(Int),
     color: color.Color,
     castling_rights: Int,
-    en_passant: option.Option(square.Square),
+    en_passant: Option(square.Square),
   )
 }
 
