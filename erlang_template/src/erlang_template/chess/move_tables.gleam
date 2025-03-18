@@ -2,8 +2,10 @@ import erlang_template/chess/bitboard
 import erlang_template/chess/magics.{MagicEntry}
 import erlang_template/chess/square
 import gleam/int
+import gleam/io
 import gleam/list
 import glearray
+import iv
 
 const white_pawn_moves = [
   0, 0, 0, 0, 0, 0, 0, 0, 65_536, 131_072, 262_144, 524_288, 1_048_576,
@@ -494,6 +496,8 @@ pub const rook_magics_list = [
   ),
 ]
 
+pub const rook_table_size = 102_400
+
 pub const bishop_magics_list = [
   MagicEntry(
     mask: 0x0040201008040200,
@@ -881,6 +885,8 @@ pub const bishop_magics_list = [
   ),
 ]
 
+pub const bishop_table_size = 5248
+
 pub type MoveTables {
   MoveTables(
     white_pawn_table: glearray.Array(Int),
@@ -900,7 +906,19 @@ const rook_move_shifts = [-1, 1, -8, 8]
 
 const bishop_move_shifts = [-7, 7, -9, 9]
 
-pub fn new_move_tables() -> MoveTables {
+pub fn new() -> MoveTables {
+  let rook_magics = glearray.from_list(rook_magics_list)
+  let bishop_magics = glearray.from_list(bishop_magics_list)
+
+  let rook_moves =
+    generate_magic_table(rook_table_size, rook_move_shifts, rook_magics)
+    |> list.map(glearray.from_list)
+    |> glearray.from_list
+  let bishop_moves =
+    generate_magic_table(bishop_table_size, bishop_move_shifts, bishop_magics)
+    |> list.map(glearray.from_list)
+    |> glearray.from_list
+
   MoveTables(
     white_pawn_table: glearray.from_list(white_pawn_moves),
     black_pawn_table: glearray.from_list(black_pawn_moves),
@@ -908,10 +926,10 @@ pub fn new_move_tables() -> MoveTables {
     black_pawn_capture_table: glearray.from_list(black_pawn_captures),
     knight_table: glearray.from_list(knight_moves),
     king_table: glearray.from_list(king_moves),
-    rook_magics: glearray.from_list(rook_magics_list),
-    rook_moves: todo,
-    bishop_magics: glearray.from_list(bishop_magics_list),
-    bishop_moves: todo,
+    rook_magics: rook_magics,
+    rook_moves: rook_moves,
+    bishop_magics: bishop_magics,
+    bishop_moves: bishop_moves,
   )
 }
 
@@ -919,64 +937,52 @@ fn generate_magic_table(
   length: Int,
   shifts: List(Int),
   magics: glearray.Array(magics.MagicEntry),
-) {
+) -> List(List(Int)) {
   use square <- list.map(square.all_squares)
   let index = square.index(square)
   let assert Ok(magic_entry) = magics |> glearray.get(index)
 
-  {
-    use blockers <- bitboard.map_subsets(magic_entry.mask)
+  magic_entry.mask
+  |> bitboard.map_subsets(fn(blockers) {
     let moves = sliding_targets(square, blockers, shifts)
     let target_magic_index = magics.magic_index(magic_entry, blockers)
     #(moves, target_magic_index)
-  }
-  |> todo
-  // TODO: Find out how to convert from a list of positions and move tables into a lookup table containing the move tables at the positions
-  // TODO: Use iv array because it has good perf for inserts
-}
-
-fn list_with_size(size: Int, fill: a) -> List(a) {
-  list_with_size_inner(size, fill, 0, [])
-}
-
-fn list_with_size_inner(size, fill, count, current_list) {
-  case size == count {
-    True -> current_list
-    False -> list_with_size_inner(size, fill, count + 1, [fill, ..current_list])
-  }
+  })
+  |> list.fold(iv.repeat(0, length), fn(a, b) {
+    let assert Ok(res) = a |> iv.set(at: b.1, to: b.0)
+    res
+  })
+  |> iv.to_list
 }
 
 pub fn rook_targets(
   square: square.Square,
-  blockers: bitboard.Bitboard,
+  blockers: Int,
   move_tables: MoveTables,
-) -> bitboard.Bitboard {
+) -> Int {
   let i = square |> square.index
   let assert Ok(magic) = move_tables.rook_magics |> glearray.get(i)
   let assert Ok(moves) = move_tables.rook_moves |> glearray.get(i)
-  let assert Ok(move) =
+  let assert Ok(targets) =
     moves |> glearray.get(magics.magic_index(magic, blockers))
-  move
+  targets
 }
 
 pub fn bishop_targets(
   square: square.Square,
-  blockers: bitboard.Bitboard,
+  blockers: Int,
   move_tables: MoveTables,
-) -> bitboard.Bitboard {
+) -> Int {
   let i = square |> square.index
-  let assert Ok(magic) = move_tables.bishop_magics |> glearray.get(i)
-  let assert Ok(moves) = move_tables.bishop_moves |> glearray.get(i)
-  let assert Ok(move) =
-    moves |> glearray.get(magics.magic_index(magic, blockers))
-  move
+  let assert Ok(magic) =
+    move_tables.bishop_magics |> glearray.get(i) |> io.debug
+  let assert Ok(moves) = move_tables.bishop_moves |> glearray.get(i) |> io.debug
+  let assert Ok(targets) =
+    moves |> glearray.get(magics.magic_index(magic, blockers)) |> io.debug
+  targets
 }
 
-pub fn sliding_targets(
-  square: square.Square,
-  blockers: bitboard.Bitboard,
-  shifts: List(Int),
-) {
+pub fn sliding_targets(square: square.Square, blockers: Int, shifts: List(Int)) {
   let index = square.index(square)
 
   shifts

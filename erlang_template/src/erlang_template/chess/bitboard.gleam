@@ -4,21 +4,18 @@ import gleam/int
 import gleam/list
 import gleam_community/maths/elementary
 
-pub type Bitboard =
-  Int
-
-pub fn squares(bitboard: Bitboard) -> List(square.Square) {
+pub fn squares(bitboard: Int) -> List(square.Square) {
   // Enforce 64-bit integer (no extra bits)
   bitboard
   |> int.bitwise_and(0xffffffffffffffff)
   |> map(square.from_index_unchecked)
 }
 
-pub fn map(bitboard: Bitboard, with cb: fn(Int) -> a) -> List(a) {
+pub fn map(bitboard: Int, with cb: fn(Int) -> a) -> List(a) {
   map_inner(bitboard, cb, [])
 }
 
-fn map_inner(bitboard: Bitboard, cb: fn(Int) -> a, accum: List(a)) -> List(a) {
+fn map_inner(bitboard: Int, cb: fn(Int) -> a, accum: List(a)) -> List(a) {
   case bitboard {
     0 -> list.reverse(accum)
     _ -> {
@@ -30,12 +27,12 @@ fn map_inner(bitboard: Bitboard, cb: fn(Int) -> a, accum: List(a)) -> List(a) {
 }
 
 /// Map function where each value is the position of a set bit, starting from the LSB.
-pub fn map_index(bitboard: Bitboard, cb: fn(Int) -> a) -> List(a) {
-  map_index_inner(bitboard, cb, [])
+pub fn map_index(bitboard: Int, cb: fn(Int) -> a) -> List(a) {
+  map_index_inner(force_u64(bitboard), cb, [])
 }
 
-pub fn map_index_inner(
-  bitboard: Bitboard,
+fn map_index_inner(
+  bitboard: Int,
   cb: fn(Int) -> a,
   accum: List(a),
 ) -> List(a) {
@@ -49,14 +46,14 @@ pub fn map_index_inner(
   }
 }
 
-pub fn map_subsets(bitboard: Bitboard, cb: fn(Bitboard) -> a) -> List(a) {
+pub fn map_subsets(bitboard: Int, cb: fn(Int) -> a) -> List(a) {
   map_subsets_inner(0, bitboard, cb, [cb(0)])
 }
 
-pub fn map_subsets_inner(
-  bitboard: Bitboard,
-  first: Bitboard,
-  cb: fn(Bitboard) -> a,
+fn map_subsets_inner(
+  bitboard: Int,
+  first: Int,
+  cb: fn(Int) -> a,
   accum: List(a),
 ) -> List(a) {
   let bitboard = int.bitwise_and(bitboard - first, first)
@@ -77,7 +74,7 @@ fn popcount_inner(value: Int, count: Int) -> Int {
   }
 }
 
-pub fn pop_lsb(bitboard: Bitboard) -> Int {
+pub fn pop_lsb(bitboard: Int) -> Int {
   case bitboard > 0 {
     True -> int.bitwise_and(bitboard, bitboard - 1)
     False -> 0
@@ -86,7 +83,7 @@ pub fn pop_lsb(bitboard: Bitboard) -> Int {
 
 // TODO: Rewrite to use precomputed tables for 8 bit ints and to check the different 
 // TODO: sections of the bitboard by splitting it into 8 bit chunks
-pub fn lsb_index(bitboard: Bitboard) -> Int {
+pub fn lsb_index(bitboard: Int) -> Int {
   case bitboard {
     0 -> -1
     _ -> {
@@ -97,4 +94,9 @@ pub fn lsb_index(bitboard: Bitboard) -> Int {
       float.truncate(log_result)
     }
   }
+}
+
+// Prevents weird behaviours
+fn force_u64(mask: Int) -> Int {
+  int.bitwise_and(mask, 0xffffffffffffffff)
 }

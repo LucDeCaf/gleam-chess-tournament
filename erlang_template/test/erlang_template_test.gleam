@@ -79,7 +79,7 @@ pub fn move_new_test() {
 }
 
 pub fn move_gen_knight_moves_test() {
-  let move_tables = move_tables.new_move_tables()
+  let move_tables = move_tables.new()
   let board =
     board.Board(
       pieces: fen.pieces(fen.starting_fen),
@@ -117,8 +117,20 @@ pub fn move_gen_sliding_targets_test() {
   |> should.equal(expected_rook_moves)
   move_tables.sliding_targets(square, blockers, bishop_shifts)
   |> should.equal(expected_bishop_moves)
-  // let square = square.A1
-  // let expected_rook_moves = 1103823438206 
-  // move_gen.sliding_targets(square, blockers, rook_shifts)
-  // |> should.equal(expected_rook_moves)
+
+  let square = square.A1
+  let expected_rook_moves = 1_103_823_438_206
+  move_tables.sliding_targets(square, blockers, rook_shifts)
+  |> should.equal(expected_rook_moves)
+}
+
+pub fn move_gen_bishop_targets_test() {
+  let move_tables = move_tables.new()
+
+  let blockers = 9_304_438_067_099_336_704
+  let square = square.from_index_unchecked(45)
+  let expected_moves = 22_518_341_868_716_032
+
+  move_tables.bishop_targets(square, blockers, move_tables)
+  |> should.equal(expected_moves)
 }

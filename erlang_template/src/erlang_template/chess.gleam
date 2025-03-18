@@ -21,7 +21,7 @@ pub fn move(
   turn: color.Color,
   failed_moves: List(String),
 ) -> Result(String, String) {
-  let move_tables = move_tables.new_move_tables()
+  let move_tables = move_tables.new()
   let board =
     board.Board(pieces: fen.pieces(fen), color: turn, castling_rights: 0b1111)
 

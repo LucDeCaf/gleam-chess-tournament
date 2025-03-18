@@ -46,13 +46,16 @@ pub fn knight_moves(
 
 pub fn bishop_moves(board: board.Board, move_tables: move_tables.MoveTables) {
   let bishops = board.bitboard(board, piece.Bishop, board.color)
-  let friendly_pieces = board.color_bitboard(board, board.color)
-  let not_friendly_pieces = int.bitwise_not(friendly_pieces)
+  let blockers = board.all_pieces(board)
 
-  bishops
-  |> bitboard.map_index(fn(source_i) {
+  bitboard.map_index(bishops, fn(source_i) {
     let source_square = source_i |> square.from_index_unchecked
-    todo
+    let targets =
+      move_tables.bishop_targets(source_square, blockers, move_tables)
+
+    use target_i <- bitboard.map_index(targets)
+    let target_square = square.from_index_unchecked(target_i)
+    move.new(source_square, target_square)
   })
   |> list.flatten
 }

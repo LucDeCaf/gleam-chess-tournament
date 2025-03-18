@@ -18,6 +18,12 @@ pub fn color_bitboard(board: Board, color: color.Color) {
   bitboard
 }
 
+pub fn all_pieces(board: Board) {
+  let assert Ok(white) = board.pieces |> glearray.get(6)
+  let assert Ok(black) = board.pieces |> glearray.get(7)
+  int.bitwise_or(white, black)
+}
+
 pub fn bitboard(board: Board, piece: piece.Piece, color: color.Color) {
   int.bitwise_and(piece_bitboard(board, piece), color_bitboard(board, color))
 }
