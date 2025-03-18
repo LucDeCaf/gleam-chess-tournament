@@ -17,3 +17,5 @@ pub fn index(piece) {
     King -> 5
   }
 }
+
+pub const valid_promotion_pieces = [Knight, Bishop, Rook, Queen]

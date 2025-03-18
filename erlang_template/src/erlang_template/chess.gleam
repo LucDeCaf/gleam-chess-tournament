@@ -4,6 +4,7 @@ import erlang_template/chess/board/move
 import erlang_template/chess/fen
 import erlang_template/chess/move_gen
 import erlang_template/chess/move_gen/move_tables
+import erlang_template/context
 import gleam/dynamic/decode
 import gleam/list
 
@@ -20,8 +21,8 @@ pub fn move(
   fen: String,
   turn: color.Color,
   failed_moves: List(String),
+  ctx: context.Context,
 ) -> Result(String, String) {
-  let move_tables = move_tables.new()
   let board =
     board.Board(
       pieces: fen.pieces(fen),
@@ -30,7 +31,7 @@ pub fn move(
       en_passant: fen.en_passant(fen),
     )
 
-  let moves = move_gen.legal_moves(board, move_tables)
+  let moves = move_gen.legal_moves(board, ctx.move_tables)
 
   // TODO: Move evaluation
 

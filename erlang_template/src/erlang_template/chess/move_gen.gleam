@@ -35,13 +35,13 @@ pub fn knight_moves(
 
   knights
   |> bitboard.map_index(fn(source_i) {
-    let source_square = square.from_index_unchecked(source_i)
+    let source = square.from_index_unchecked(source_i)
 
     let assert Ok(targets) = move_tables.knight_table |> glearray.get(source_i)
     let valid_targets = targets |> int.bitwise_and(not_friendly_pieces)
 
     use target_i <- bitboard.map_index(valid_targets)
-    let target_square = square.from_index_unchecked(target_i)
+    let target = square.from_index_unchecked(target_i)
     let is_capture =
       {
         bitboard.from_index(target_i)
@@ -49,7 +49,7 @@ pub fn knight_moves(
       }
       != 0
 
-    move.new(source_square, target_square, flags.new(None, is_capture, 0))
+    move.new(source, target, flags.new(None, is_capture, 0))
   })
   |> list.flatten
 }
@@ -65,9 +65,9 @@ pub fn bishop_moves(
   let blockers = int.bitwise_or(friendly_pieces, enemy_pieces)
 
   bitboard.map_index(bishops, fn(source_i) {
-    let source_square = source_i |> square.from_index_unchecked
+    let source = source_i |> square.from_index_unchecked
     let targets =
-      move_tables.bishop_targets(source_square, blockers, move_tables)
+      move_tables.bishop_targets(source, blockers, move_tables)
       |> int.bitwise_and(not_friendly_pieces)
 
     use target_i <- bitboard.map_index(targets)
@@ -77,8 +77,8 @@ pub fn bishop_moves(
         |> int.bitwise_and(enemy_pieces)
       }
       != 0
-    let target_square = square.from_index_unchecked(target_i)
-    move.new(source_square, target_square, flags.new(None, is_capture, 0))
+    let target = square.from_index_unchecked(target_i)
+    move.new(source, target, flags.new(None, is_capture, 0))
   })
   |> list.flatten
 }
@@ -94,9 +94,9 @@ pub fn rook_moves(
   let blockers = int.bitwise_or(friendly_pieces, enemy_pieces)
 
   bitboard.map_index(rooks, fn(source_i) {
-    let source_square = source_i |> square.from_index_unchecked
+    let source = source_i |> square.from_index_unchecked
     let targets =
-      move_tables.rook_targets(source_square, blockers, move_tables)
+      move_tables.rook_targets(source, blockers, move_tables)
       |> int.bitwise_and(not_friendly_pieces)
 
     use target_i <- bitboard.map_index(targets)
@@ -106,8 +106,8 @@ pub fn rook_moves(
         |> int.bitwise_and(enemy_pieces)
       }
       != 0
-    let target_square = square.from_index_unchecked(target_i)
-    move.new(source_square, target_square, flags.new(None, is_capture, 0))
+    let target = square.from_index_unchecked(target_i)
+    move.new(source, target, flags.new(None, is_capture, 0))
   })
   |> list.flatten
 }
@@ -123,11 +123,11 @@ pub fn queen_moves(
   let blockers = int.bitwise_or(friendly_pieces, enemy_pieces)
 
   bitboard.map_index(queens, fn(source_i) {
-    let source_square = source_i |> square.from_index_unchecked
+    let source = source_i |> square.from_index_unchecked
     let targets =
       int.bitwise_or(
-        move_tables.rook_targets(source_square, blockers, move_tables),
-        move_tables.bishop_targets(source_square, blockers, move_tables),
+        move_tables.rook_targets(source, blockers, move_tables),
+        move_tables.bishop_targets(source, blockers, move_tables),
       )
       |> int.bitwise_and(not_friendly_pieces)
 
@@ -138,8 +138,8 @@ pub fn queen_moves(
         |> int.bitwise_and(enemy_pieces)
       }
       != 0
-    let target_square = square.from_index_unchecked(target_i)
-    move.new(source_square, target_square, flags.new(None, is_capture, 0))
+    let target = square.from_index_unchecked(target_i)
+    move.new(source, target, flags.new(None, is_capture, 0))
   })
   |> list.flatten
 }
@@ -153,6 +153,20 @@ pub fn pawn_straight_moves(board: board.Board) -> List(move.Move) {
     pawns
     |> shift_forward(8, board.color)
     |> int.bitwise_and(int.bitwise_not(blockers))
+
+  let promotion_targets =
+    single_move_targets
+    |> int.bitwise_and(case board.color {
+      // 8th rank
+      color.White -> 0xff00000000000000
+      // 1st rank
+      color.Black -> 0x00000000000000ff
+    })
+
+  // Handle promotions and regular pushes separately
+  let single_move_targets =
+    single_move_targets |> int.bitwise_and(int.bitwise_not(promotion_targets))
+
   let unmoved_pawns =
     pawns
     |> int.bitwise_and(case board.color {
@@ -168,32 +182,41 @@ pub fn pawn_straight_moves(board: board.Board) -> List(move.Move) {
     |> shift_forward(8, board.color)
     |> int.bitwise_and(int.bitwise_not(blockers))
 
-  // TODO: Promotions
-  list.append(
-    // Single moves
-    bitboard.map_index(single_move_targets, fn(target_i) {
-      let source_i = case board.color {
-        color.White -> target_i - 8
-        color.Black -> target_i + 8
-      }
-      let source_square = square.from_index_unchecked(source_i)
-      let target_square = square.from_index_unchecked(target_i)
-      move.new(source_square, target_square, flags.new(None, False, 0))
-    }),
-    // Double moves
+  // Single moves
+  bitboard.map_index(single_move_targets, fn(target_i) {
+    let source_i = case board.color {
+      color.White -> target_i - 8
+      color.Black -> target_i + 8
+    }
+    let source = square.from_index_unchecked(source_i)
+    let target = square.from_index_unchecked(target_i)
+    move.new(source, target, flags.new(None, False, 0))
+  })
+  // Double moves
+  |> list.append(
     bitboard.map_index(double_move_targets, fn(target_i) {
       let source_i = case board.color {
         color.White -> target_i - 16
         color.Black -> target_i + 16
       }
-      let source_square = square.from_index_unchecked(source_i)
-      let target_square = square.from_index_unchecked(target_i)
-      move.new(
-        source_square,
-        target_square,
-        flags.new(None, False, flags.double_move),
-      )
+      let source = square.from_index_unchecked(source_i)
+      let target = square.from_index_unchecked(target_i)
+      move.new(source, target, flags.new(None, False, flags.double_move))
     }),
+  )
+  // Promotions
+  |> list.append(
+    bitboard.map_index(promotion_targets, fn(target_i) {
+      let source_i = case board.color {
+        color.White -> target_i - 8
+        color.Black -> target_i + 8
+      }
+      let source = square.from_index_unchecked(source_i)
+      let target = square.from_index_unchecked(target_i)
+      use piece <- list.map(piece.valid_promotion_pieces)
+      move.new(source, target, flags.new(Some(piece), False, 0))
+    })
+    |> list.flatten,
   )
 }
 
@@ -211,7 +234,7 @@ pub fn pawn_captures(
   let pawns = board |> board.bitboard(piece.Pawn, board.color)
   let enemies = board |> board.color_bitboard(board.color |> color.inverse)
 
-  // TODO: Promotions
+  // Captures
   let moves =
     bitboard.map_index(pawns, fn(source_i) {
       let assert Ok(targets) =
@@ -222,31 +245,46 @@ pub fn pawn_captures(
         |> glearray.get(source_i)
       let valid_targets = targets |> int.bitwise_and(enemies)
 
-      use target_i <- bitboard.map_index(valid_targets)
-      let source_square = square.from_index_unchecked(source_i)
-      let target_square = square.from_index_unchecked(target_i)
-      move.new(source_square, target_square, flags.new(None, True, 0))
+      let is_promotion =
+        square.rank(source_i)
+        == case board.color {
+          color.White -> 6
+          color.Black -> 1
+        }
+
+      case is_promotion {
+        // Promotion - will generate [[left_capture_promotions], [right_capture_promotions]] |> flatten
+        True -> {
+          valid_targets
+          |> bitboard.map_index(fn(target_i) {
+            let source = square.from_index_unchecked(source_i)
+            let target = square.from_index_unchecked(target_i)
+            use piece <- list.map(piece.valid_promotion_pieces)
+            move.new(source, target, flags.new(Some(piece), False, 0))
+          })
+          |> list.flatten
+        }
+        // Not a promotion - will generate [left_capture, right_capture]
+        False -> {
+          use target_i <- bitboard.map_index(valid_targets)
+          let source = square.from_index_unchecked(source_i)
+          let target = square.from_index_unchecked(target_i)
+          move.new(source, target, flags.new(None, True, 0))
+        }
+      }
     })
     |> list.flatten
 
   // En passant
   case board.en_passant {
-    Some(target_square) -> {
+    Some(target) -> {
       moves
       |> list.append(
-        move_tables.en_passant_source_masks(
-          target_square,
-          board.color,
-          move_tables,
-        )
+        move_tables.en_passant_source_masks(target, board.color, move_tables)
         |> int.bitwise_and(pawns)
         |> bitboard.map_index(fn(source_i) {
-          let source_square = square.from_index_unchecked(source_i)
-          move.new(
-            source_square,
-            target_square,
-            flags.new(None, True, flags.en_passant),
-          )
+          let source = square.from_index_unchecked(source_i)
+          move.new(source, target, flags.new(None, True, flags.en_passant))
         }),
       )
     }
