@@ -11,7 +11,9 @@ import wisp/wisp_mist
 
 pub fn main() {
   // engine_main()
-  perft.run(1)
+
+  // TODO: Refactor into http://localhost:8000/perft?depth=n
+  perft.run(2)
 }
 
 fn engine_main() {

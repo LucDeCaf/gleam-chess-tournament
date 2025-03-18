@@ -29,7 +29,7 @@ fn perft(board: board.Board, depth: Int, tables: move_tables.MoveTables) -> Int 
         })
         |> list.fold(0, int.add)
 
-      move_count + subposition_move_count
+      subposition_move_count
     }
   }
 }
