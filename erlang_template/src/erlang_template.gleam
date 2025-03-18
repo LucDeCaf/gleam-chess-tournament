@@ -5,10 +5,16 @@ import gleam/dynamic/decode
 import gleam/erlang/process
 import gleam/json
 import mist
+import perft
 import wisp.{type Request, type Response}
 import wisp/wisp_mist
 
 pub fn main() {
+  // engine_main()
+  perft.run(1)
+}
+
+fn engine_main() {
   wisp.configure_logger()
   let secret_key_base = wisp.random_string(64)
 

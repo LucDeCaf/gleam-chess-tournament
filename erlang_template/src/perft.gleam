@@ -5,10 +5,10 @@ import erlang_template/chess/move_gen/move_tables
 import gleam/int
 import gleam/list
 
-pub fn main() {
+pub fn run(depth: Int) {
   let move_tables = move_tables.new()
   let board = board.from_fen(fen.starting_fen)
-  echo perft(board, 2, move_tables)
+  echo perft(board, depth, move_tables)
 }
 
 fn perft(board: board.Board, depth: Int, tables: move_tables.MoveTables) -> Int {

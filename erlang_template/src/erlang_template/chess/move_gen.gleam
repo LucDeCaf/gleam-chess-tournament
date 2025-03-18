@@ -7,6 +7,7 @@ import erlang_template/chess/board/piece
 import erlang_template/chess/board/square
 import erlang_template/chess/move_gen/move_tables
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import glearray
@@ -26,12 +27,18 @@ pub fn pseudolegal_moves(board: board.Board, move_tables) -> List(move.Move) {
   let pawn_moves = pawn_straight_moves(board)
   let pawn_captures = pawn_captures(board, move_tables)
 
-  knight_moves
-  |> list.append(bishop_moves)
-  |> list.append(rook_moves)
-  |> list.append(queen_moves)
-  |> list.append(pawn_moves)
-  |> list.append(pawn_captures)
+  let moves =
+    knight_moves
+    |> list.append(bishop_moves)
+    |> list.append(rook_moves)
+    |> list.append(queen_moves)
+    |> list.append(pawn_moves)
+    |> list.append(pawn_captures)
+
+  moves
+  |> list.map(fn(move) { echo move |> move.to_debug_string })
+
+  moves
 }
 
 pub fn knight_moves(
@@ -70,7 +77,7 @@ pub fn bishop_moves(
 ) -> List(move.Move) {
   let bishops = board.bitboard(board, piece.Bishop, board.color)
   let friendly_pieces = board |> board.color_bitboard(board.color)
-  let not_friendly_pieces = board |> board.color_bitboard(board.color)
+  let not_friendly_pieces = int.bitwise_not(friendly_pieces)
   let enemy_pieces = board |> board.color_bitboard(board.color |> color.inverse)
   let blockers = int.bitwise_or(friendly_pieces, enemy_pieces)
 
@@ -99,7 +106,7 @@ pub fn rook_moves(
 ) -> List(move.Move) {
   let rooks = board.bitboard(board, piece.Rook, board.color)
   let friendly_pieces = board |> board.color_bitboard(board.color)
-  let not_friendly_pieces = board |> board.color_bitboard(board.color)
+  let not_friendly_pieces = int.bitwise_not(friendly_pieces)
   let enemy_pieces = board |> board.color_bitboard(board.color |> color.inverse)
   let blockers = int.bitwise_or(friendly_pieces, enemy_pieces)
 
