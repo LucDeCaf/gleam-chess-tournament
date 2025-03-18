@@ -3,7 +3,6 @@ import erlang_template/chess/board/color
 import erlang_template/chess/board/move
 import erlang_template/chess/fen
 import erlang_template/chess/move_gen
-import erlang_template/chess/move_gen/move_tables
 import erlang_template/context
 import gleam/dynamic/decode
 import gleam/list
@@ -20,8 +19,8 @@ pub fn player_decoder() {
 pub fn move(
   fen: String,
   turn: color.Color,
-  failed_moves: List(String),
   ctx: context.Context,
+  failed_moves _failed_moves: List(String),
 ) -> Result(String, String) {
   let board =
     board.Board(

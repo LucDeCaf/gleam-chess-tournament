@@ -47,7 +47,7 @@ fn handle_move(request: Request, ctx: context.Context) -> Response {
   case decode_result {
     Error(_) -> wisp.bad_request()
     Ok(move) -> {
-      let move_result = chess.move(move.0, move.1, move.2, ctx)
+      let move_result = chess.move(move.0, move.1, ctx, move.2)
       case move_result {
         Ok(move) -> wisp.ok() |> wisp.string_body(move)
         Error(reason) ->

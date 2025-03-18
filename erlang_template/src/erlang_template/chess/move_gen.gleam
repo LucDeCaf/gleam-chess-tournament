@@ -17,11 +17,21 @@ pub fn legal_moves(board: board.Board, move_tables) -> List(move.Move) {
   })
 }
 
-fn pseudolegal_moves(board: board.Board, move_tables) -> List(move.Move) {
-  // TODO: Move generator
+pub fn pseudolegal_moves(board: board.Board, move_tables) -> List(move.Move) {
+  // TODO: Move generators
   let knight_moves = knight_moves(board, move_tables)
+  let bishop_moves = bishop_moves(board, move_tables)
+  let rook_moves = rook_moves(board, move_tables)
+  let queen_moves = queen_moves(board, move_tables)
+  let pawn_moves = pawn_straight_moves(board)
+  let pawn_captures = pawn_captures(board, move_tables)
 
   knight_moves
+  |> list.append(bishop_moves)
+  |> list.append(rook_moves)
+  |> list.append(queen_moves)
+  |> list.append(pawn_moves)
+  |> list.append(pawn_captures)
 }
 
 pub fn knight_moves(

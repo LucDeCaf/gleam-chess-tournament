@@ -1,3 +1,4 @@
+import erlang_template/chess/board/color
 import erlang_template/chess/board/square
 import gleam/int
 import gleam/list
@@ -100,6 +101,42 @@ fn get_piece(
         _ -> #(position + 1, piece_chars |> list.contains(any: char))
       }
   }
+}
+
+pub fn color(fen: String) -> color.Color {
+  let assert Ok(color_string) =
+    fen |> string.split(" ") |> list.take(2) |> list.last
+  case color_string {
+    "w" -> color.White
+    "b" -> color.Black
+    _ -> panic as { "invalid fen color section '" <> color_string <> "'" }
+  }
+}
+
+pub fn castling_rights(fen: String) -> Int {
+  let assert Ok(castling_rights) =
+    fen |> string.split(" ") |> list.take(3) |> list.last
+
+  let white_kingside = case castling_rights |> string.contains("K") {
+    True -> 0b0001
+    False -> 0
+  }
+  let white_queenside = case castling_rights |> string.contains("Q") {
+    True -> 0b0010
+    False -> 0
+  }
+  let black_kingside = case castling_rights |> string.contains("k") {
+    True -> 0b0100
+    False -> 0
+  }
+  let black_queenside = case castling_rights |> string.contains("q") {
+    True -> 0b1000
+    False -> 0
+  }
+  white_kingside
+  |> int.bitwise_or(white_queenside)
+  |> int.bitwise_or(black_kingside)
+  |> int.bitwise_or(black_queenside)
 }
 
 pub fn en_passant(fen: String) -> option.Option(square.Square) {

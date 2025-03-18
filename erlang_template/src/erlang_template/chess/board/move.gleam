@@ -1,6 +1,8 @@
 import erlang_template/chess/board/flags
+import erlang_template/chess/board/piece
 import erlang_template/chess/board/square
 import gleam/int
+import gleam/option.{None, Some}
 
 const from_mask = 0b1111110000000000
 
@@ -36,8 +38,28 @@ pub fn target(move: Move) -> square.Square {
   |> square.from_index_unchecked
 }
 
-pub fn flags(move: Move) -> square.Square {
-  move |> int.bitwise_and(flags_mask) |> square.from_index_unchecked
+pub fn flags(move: Move) -> Int {
+  move |> int.bitwise_and(flags_mask)
+}
+
+pub fn promotion(move: Move) {
+  let flags = move |> flags
+  let is_promotion = { flags |> int.bitwise_and(flags.promotion) } != 0
+  case is_promotion {
+    True ->
+      Some(case flags |> int.bitwise_and(0b11) {
+        0 -> piece.Knight
+        0b01 -> piece.Bishop
+        0b10 -> piece.Rook
+        0b11 -> piece.Queen
+        _ -> panic as "unreachable"
+      })
+    False -> None
+  }
+}
+
+pub fn is_capture(move: Move) -> Bool {
+  int.bitwise_and(move, flags.capture) != 0
 }
 
 pub fn to_string(move: Move) -> String {
