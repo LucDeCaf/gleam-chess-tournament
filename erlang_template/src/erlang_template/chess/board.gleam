@@ -140,7 +140,7 @@ pub fn make_move(on board: Board, play move: move.Move) -> Board {
   }
 }
 
-// TODO: Tests
+// TODO: Refactor to look more like handle_normal_moves (!!! IMPORTANT !!!) and tests
 fn handle_promotion(
   board: Board,
   source: square.Square,
@@ -207,17 +207,11 @@ fn handle_promotion(
     |> glearray.to_list
     |> list.index_map(fn(bitboard, i) {
       case i {
-        // Replace pawns with new bb
         0 -> new_pawn_bitboard
-        // Replace promoted piece bb
         i if i == promotion_bitboard_i -> new_promotion_piece_bitboard
-        // Replace captured piece bb
         i if i == captured_bitboard_i -> new_captured_piece_bitboard
-        // White pieces
         6 -> color_bitboards.0
-        // Black pieces
         7 -> color_bitboards.1
-        // Just copy bb for most
         _ -> bitboard
       }
     })
@@ -267,7 +261,8 @@ fn handle_castle(board: Board, target: square.Square) -> Board {
     |> glearray.from_list
 
   let castling_rights =
-    board.castling_rights |> int.bitwise_exclusive_or(removed_castling_right)
+    board.castling_rights
+    |> int.bitwise_and(int.bitwise_not(removed_castling_right))
 
   Board(
     pieces: pieces,
@@ -277,6 +272,7 @@ fn handle_castle(board: Board, target: square.Square) -> Board {
   )
 }
 
+// TODO: Tests
 fn handle_en_passant(
   board: Board,
   source: square.Square,
@@ -327,13 +323,102 @@ fn handle_en_passant(
   )
 }
 
+// TODO: Tests
 fn handle_normal_move(
   board: Board,
   source: square.Square,
   target: square.Square,
   moved_piece: piece.Piece,
 ) -> Board {
-  todo
+  let captured_piece = board |> piece_at(target)
+
+  let source_i = source |> square.index
+  let target_i = target |> square.index
+  let source_bb = source_i |> bitboard.from_index
+  let target_bb = target_i |> bitboard.from_index
+
+  let moved_piece_mask = source_bb |> int.bitwise_or(target_bb)
+  let moved_bb_i = moved_piece |> piece.index
+
+  let #(captured_piece_mask, captured_bb_i) = case captured_piece {
+    Some(piece) -> #(target_bb, piece |> piece.index)
+    None -> #(0, -1)
+  }
+
+  let #(friendly_bb_index, enemy_bb_index) = case board.color {
+    color.White -> #(6, 7)
+    color.Black -> #(7, 6)
+  }
+
+  let pieces =
+    board.pieces
+    |> glearray.to_list
+    |> list.index_map(fn(bitboard, i) {
+      int.bitwise_exclusive_or(bitboard, case i {
+        i if i == moved_bb_i -> moved_piece_mask
+        i if i == captured_bb_i -> captured_piece_mask
+        i if i == friendly_bb_index -> moved_piece_mask
+        i if i == enemy_bb_index -> captured_piece_mask
+        _ -> 0
+      })
+    })
+    |> glearray.from_list
+
+  let removed_castling_rights = case moved_piece {
+    // King move - remove all rights
+    piece.King ->
+      case board.color {
+        color.White -> 0b0011
+        color.Black -> 0b1100
+      }
+    _ ->
+      // Captured rook
+      case target {
+        square.H1 -> 0b0001
+        square.A1 -> 0b0010
+        square.H8 -> 0b0100
+        square.A8 -> 0b1000
+        _ -> 0
+      }
+      // Rook moves
+      |> int.bitwise_or(case source {
+        square.H1 -> 0b0001
+        square.A1 -> 0b0010
+        square.H8 -> 0b0100
+        square.A8 -> 0b1000
+        _ -> 0
+      })
+  }
+
+  let castling_rights =
+    board.castling_rights
+    |> int.bitwise_and(int.bitwise_not(removed_castling_rights))
+
+  let en_passant = case
+    moved_piece == piece.Pawn && is_double_move(source, target)
+  {
+    True -> en_passant_square(source)
+    False -> None
+  }
+
+  Board(pieces, board.color |> color.inverse, castling_rights, en_passant)
+}
+
+fn is_double_move(source, target) {
+  int.absolute_value(
+    { source |> square.index |> square.rank }
+    - { target |> square.index |> square.rank },
+  )
+  == 2
+}
+
+fn en_passant_square(source) {
+  let source_i = source |> square.index
+  case source_i |> square.rank {
+    1 -> source_i + 8 |> square.from_index |> option.from_result
+    6 -> source_i - 1 |> square.from_index |> option.from_result
+    _ -> None
+  }
 }
 
 pub fn is_legal_move(board: Board, move: move.Move) -> Bool {
