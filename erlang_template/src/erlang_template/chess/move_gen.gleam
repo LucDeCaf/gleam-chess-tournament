@@ -7,7 +7,6 @@ import erlang_template/chess/board/piece
 import erlang_template/chess/board/square
 import erlang_template/chess/move_gen/move_tables
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import glearray
@@ -24,23 +23,20 @@ pub fn pseudolegal_moves(board: board.Board, move_tables) -> List(move.Move) {
   let bishop_moves = bishop_moves(board, move_tables)
   let rook_moves = rook_moves(board, move_tables)
   let queen_moves = queen_moves(board, move_tables)
+  let king_moves = king_moves(board, move_tables)
   let pawn_moves = pawn_straight_moves(board)
   let pawn_captures = pawn_captures(board, move_tables)
 
-  let moves =
-    knight_moves
-    |> list.append(bishop_moves)
-    |> list.append(rook_moves)
-    |> list.append(queen_moves)
-    |> list.append(pawn_moves)
-    |> list.append(pawn_captures)
-
-  moves
-  |> list.map(fn(move) { echo move |> move.to_debug_string })
-
-  moves
+  knight_moves
+  |> list.append(bishop_moves)
+  |> list.append(rook_moves)
+  |> list.append(queen_moves)
+  |> list.append(king_moves)
+  |> list.append(pawn_moves)
+  |> list.append(pawn_captures)
 }
 
+// TODO: Test movegen funcs using kiwipete to ensure captures work properly
 pub fn knight_moves(
   board: board.Board,
   move_tables: move_tables.MoveTables,
@@ -308,4 +304,31 @@ pub fn pawn_captures(
     None -> moves
   }
 }
+
 // TODO: Castling
+pub fn king_moves(board: board.Board, move_tables: move_tables.MoveTables) {
+  let kings = board.bitboard(board, piece.King, board.color)
+  let friendly_pieces = board.color_bitboard(board, board.color)
+  let not_friendly_pieces = int.bitwise_not(friendly_pieces)
+  let enemy_pieces = board.color_bitboard(board, board.color |> color.inverse)
+
+  kings
+  |> bitboard.map_index(fn(source_i) {
+    let source = square.from_index_unchecked(source_i)
+
+    let assert Ok(targets) = move_tables.king_table |> glearray.get(source_i)
+    let valid_targets = targets |> int.bitwise_and(not_friendly_pieces)
+
+    use target_i <- bitboard.map_index(valid_targets)
+    let target = square.from_index_unchecked(target_i)
+    let is_capture =
+      {
+        bitboard.from_index(target_i)
+        |> int.bitwise_and(enemy_pieces)
+      }
+      != 0
+
+    move.new(source, target, flags.new(None, is_capture, 0))
+  })
+  |> list.flatten
+}

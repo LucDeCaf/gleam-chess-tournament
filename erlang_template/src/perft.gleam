@@ -5,9 +5,11 @@ import erlang_template/chess/move_gen/move_tables
 import gleam/int
 import gleam/list
 
+// TODO: More comprehensive results, compare against known results, auto-narrowing of errors using SF?
 pub fn run(depth: Int) {
   let move_tables = move_tables.new()
   let board = board.from_fen(fen.starting_fen)
+  echo "running perft:"
   echo perft(board, depth, move_tables)
 }
 

@@ -13,7 +13,7 @@ pub fn main() {
   // engine_main()
 
   // TODO: Refactor into http://localhost:8000/perft?depth=n
-  perft.run(2)
+  perft.run(3)
 }
 
 fn engine_main() {
