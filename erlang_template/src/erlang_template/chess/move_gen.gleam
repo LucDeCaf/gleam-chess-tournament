@@ -76,9 +76,9 @@ pub fn square_attacked_by(
   != 0
 }
 
-pub fn legal_moves(board: board.Board, move_tables) -> List(move.Move) {
+pub fn legal_moves(board, move_tables) -> List(move.Move) {
   list.filter(pseudolegal_moves(board, move_tables), fn(move) {
-    board.is_legal_move(board, move)
+    is_legal_move(board, move, move_tables)
   })
 }
 
@@ -404,4 +404,23 @@ pub fn king_moves(board: board.Board, move_tables: move_tables.MoveTables) {
     move.new(source, target, flags.new(None, is_capture, 0))
   })
   |> list.flatten
+}
+
+// TODO: Optimise to not have to play the move to check if it is legal
+// TODO: Tests
+pub fn is_legal_move(
+  board: board.Board,
+  move: move.Move,
+  move_tables: move_tables.MoveTables,
+) -> Bool {
+  let post_move = board |> board.make_move(move)
+  let king_square =
+    post_move
+    |> board.bitboard(piece.King, board.color)
+    |> bitboard.pop_lsb
+    |> square.from_index_unchecked
+
+  !{
+    post_move |> square_attacked_by(king_square, post_move.color, move_tables)
+  }
 }

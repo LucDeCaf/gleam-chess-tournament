@@ -5,7 +5,9 @@ import erlang_template/chess/fen
 import erlang_template/chess/move_gen
 import erlang_template/context
 import gleam/dynamic/decode
+import gleam/io
 import gleam/list
+import gleam/result
 
 pub fn player_decoder() {
   use player_string <- decode.then(decode.string)
@@ -34,7 +36,11 @@ pub fn move(
 
   // TODO: Move evaluation
 
-  let assert Ok(first) = moves |> list.first
+  let first = moves |> list.first |> result.unwrap(0)
+  case first {
+    0 -> io.debug("null move: " <> fen)
+    _ -> ""
+  }
 
   Ok(move.to_string(first))
 }
