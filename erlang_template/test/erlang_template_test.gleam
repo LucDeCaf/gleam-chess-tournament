@@ -111,37 +111,20 @@ pub fn move_gen_knight_moves_test() {
 }
 
 pub fn move_gen_sliding_targets_test() {
-  let rook_shifts = [-1, 1, -8, 8]
-  let bishop_shifts = [-7, 7, -9, 9]
+  let blockers = 0x8120012000140000
+  let square = square.F6
 
-  let blockers = 9_304_438_067_099_336_704
-  let square = square.from_index_unchecked(45)
+  let expected_bishop_moves = 0x8850005088040000
+  let expected_rook_moves = 0x20df2000000000
 
-  let expected_bishop_moves = 22_518_341_868_716_032
-  let expected_rook_moves = 9_110_690_786_705_408
-
-  move_tables.sliding_targets(square, blockers, rook_shifts)
+  move_tables.sliding_targets(square, blockers, move_tables.rook_move_shifts)
   |> should.equal(expected_rook_moves)
-  move_tables.sliding_targets(square, blockers, bishop_shifts)
+  move_tables.sliding_targets(square, blockers, move_tables.bishop_move_shifts)
   |> should.equal(expected_bishop_moves)
 
   let square = square.A1
-  let expected_rook_moves = 1_103_823_438_206
-  move_tables.sliding_targets(square, blockers, rook_shifts)
-  |> should.equal(expected_rook_moves)
-}
-
-pub fn move_gen_bishop_targets_test() {
-  let move_tables = move_tables.new()
-  let blockers = 9_304_438_067_099_336_704
-  let square = square.from_index_unchecked(45)
-
-  let expected_bishop_moves = 22_518_341_868_716_032
-  let expected_rook_moves = 9_110_690_786_705_408
-
-  move_tables.bishop_targets(square, blockers, move_tables)
-  |> should.equal(expected_bishop_moves)
-  move_tables.rook_targets(square, blockers, move_tables)
+  let expected_rook_moves = 0x101010101fe
+  move_tables.sliding_targets(square, blockers, move_tables.rook_move_shifts)
   |> should.equal(expected_rook_moves)
 }
 

@@ -10,10 +10,9 @@ import wisp.{type Request, type Response}
 import wisp/wisp_mist
 
 pub fn main() {
-  // engine_main()
-
+  engine_main()
   // TODO: Refactor into http://localhost:8000/perft?depth=n
-  perft.run(3)
+  // perft.run(3)
 }
 
 fn engine_main() {

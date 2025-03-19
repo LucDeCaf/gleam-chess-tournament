@@ -18,10 +18,9 @@ pub fn legal_moves(board: board.Board, move_tables) -> List(move.Move) {
 }
 
 pub fn pseudolegal_moves(board: board.Board, move_tables) -> List(move.Move) {
-  // TODO: Move generators
   let knight_moves = knight_moves(board, move_tables)
-  let bishop_moves = bishop_moves(board, move_tables)
-  let rook_moves = rook_moves(board, move_tables)
+  let bishop_moves = bishop_moves(board)
+  let rook_moves = rook_moves(board)
   let queen_moves = queen_moves(board, move_tables)
   let king_moves = king_moves(board, move_tables)
   let pawn_moves = pawn_straight_moves(board)
@@ -69,7 +68,7 @@ pub fn knight_moves(
 
 pub fn bishop_moves(
   board: board.Board,
-  move_tables: move_tables.MoveTables,
+  // move_tables: move_tables.MoveTables,
 ) -> List(move.Move) {
   let bishops = board.bitboard(board, piece.Bishop, board.color)
   let friendly_pieces = board |> board.color_bitboard(board.color)
@@ -80,7 +79,11 @@ pub fn bishop_moves(
   bitboard.map_index(bishops, fn(source_i) {
     let source = source_i |> square.from_index_unchecked
     let targets =
-      move_tables.bishop_targets(source, blockers, move_tables)
+      move_tables.sliding_targets(
+        source,
+        blockers,
+        move_tables.bishop_move_shifts,
+      )
       |> int.bitwise_and(not_friendly_pieces)
 
     use target_i <- bitboard.map_index(targets)
@@ -98,7 +101,7 @@ pub fn bishop_moves(
 
 pub fn rook_moves(
   board: board.Board,
-  move_tables: move_tables.MoveTables,
+  // move_tables: move_tables.MoveTables,
 ) -> List(move.Move) {
   let rooks = board.bitboard(board, piece.Rook, board.color)
   let friendly_pieces = board |> board.color_bitboard(board.color)
@@ -109,7 +112,11 @@ pub fn rook_moves(
   bitboard.map_index(rooks, fn(source_i) {
     let source = source_i |> square.from_index_unchecked
     let targets =
-      move_tables.rook_targets(source, blockers, move_tables)
+      move_tables.sliding_targets(
+        source,
+        blockers,
+        move_tables.rook_move_shifts,
+      )
       |> int.bitwise_and(not_friendly_pieces)
 
     use target_i <- bitboard.map_index(targets)
@@ -138,9 +145,10 @@ pub fn queen_moves(
   bitboard.map_index(queens, fn(source_i) {
     let source = source_i |> square.from_index_unchecked
     let targets =
-      int.bitwise_or(
-        move_tables.rook_targets(source, blockers, move_tables),
-        move_tables.bishop_targets(source, blockers, move_tables),
+      move_tables.sliding_targets(
+        source,
+        blockers,
+        move_tables.queen_move_shifts,
       )
       |> int.bitwise_and(not_friendly_pieces)
 
