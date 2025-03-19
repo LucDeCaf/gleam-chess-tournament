@@ -368,6 +368,7 @@ fn en_passant_square(source) {
   }
 }
 
+// TODO: Optimise to not have to play the move to check if it is legal
 pub fn is_legal_move(board: Board, move: move.Move) -> Bool {
   // TODO: Legal move checker
   True

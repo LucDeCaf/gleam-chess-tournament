@@ -11,6 +11,71 @@ import gleam/list
 import gleam/option.{None, Some}
 import glearray
 
+// TODO: Tests
+pub fn attacks_to(
+  board: board.Board,
+  square: square.Square,
+  move_tables: move_tables.MoveTables,
+) -> Int {
+  let knights = board |> board.piece_bitboard(piece.Knight)
+  let kings = board |> board.piece_bitboard(piece.King)
+  let rooks = board |> board.piece_bitboard(piece.Rook)
+  let bishops = board |> board.piece_bitboard(piece.Bishop)
+  let queens = board |> board.piece_bitboard(piece.Queen)
+  let rooks_queens = queens |> int.bitwise_or(rooks)
+  let bishops_queens = queens |> int.bitwise_or(bishops)
+  let white_pawns = board |> board.bitboard(piece.Pawn, color.White)
+  let black_pawns = board |> board.bitboard(piece.Pawn, color.Black)
+
+  let square_i = square |> square.index
+  let assert Ok(knight_attacks) =
+    move_tables.knight_table |> glearray.get(square_i)
+  let assert Ok(king_attacks) = move_tables.king_table |> glearray.get(square_i)
+  let assert Ok(white_pawn_attacks) =
+    move_tables.white_pawn_capture_table |> glearray.get(square_i)
+  let assert Ok(black_pawn_attacks) =
+    move_tables.black_pawn_capture_table |> glearray.get(square_i)
+
+  let blockers = board |> board.all_pieces
+  let rook_queen_attacks =
+    move_tables.sliding_targets(square, blockers, move_tables.rook_move_shifts)
+  let bishop_queen_attacks =
+    move_tables.sliding_targets(
+      square,
+      blockers,
+      move_tables.bishop_move_shifts,
+    )
+
+  let attacking_knights = knight_attacks |> int.bitwise_and(knights)
+  let attacking_kings = king_attacks |> int.bitwise_and(kings)
+  let attacking_white_pawns = black_pawn_attacks |> int.bitwise_and(white_pawns)
+  let attacking_black_pawns = white_pawn_attacks |> int.bitwise_and(black_pawns)
+  let attacking_rooks_queens =
+    rook_queen_attacks |> int.bitwise_and(rooks_queens)
+  let attacking_bishops_queens =
+    bishop_queen_attacks |> int.bitwise_and(bishops_queens)
+
+  attacking_knights
+  |> int.bitwise_or(attacking_kings)
+  |> int.bitwise_or(attacking_white_pawns)
+  |> int.bitwise_or(attacking_black_pawns)
+  |> int.bitwise_or(attacking_rooks_queens)
+  |> int.bitwise_or(attacking_bishops_queens)
+}
+
+// TODO: Tests
+pub fn square_attacked_by(
+  board: board.Board,
+  square: square.Square,
+  color: color.Color,
+  move_tables: move_tables.MoveTables,
+) -> Bool {
+  board
+  |> attacks_to(square, move_tables)
+  |> int.bitwise_and(board |> board.color_bitboard(color))
+  != 0
+}
+
 pub fn legal_moves(board: board.Board, move_tables) -> List(move.Move) {
   list.filter(pseudolegal_moves(board, move_tables), fn(move) {
     board.is_legal_move(board, move)
