@@ -104,7 +104,7 @@ pub fn make_move(on board: Board, play move: move.Move) -> Board {
   }
 }
 
-// TODO: Refactor to look more like handle_normal_moves (!!! IMPORTANT !!!) and tests
+// TODO: Tests
 fn handle_promotion(
   board: Board,
   source: square.Square,
@@ -119,73 +119,56 @@ fn handle_promotion(
   let captured_piece = board |> piece_at(target)
   let is_capture = option.is_some(captured_piece)
 
-  let friendly_bitboard = board |> color_bitboard(board.color)
-  let enemy_bitboard = board |> color_bitboard(board.color |> color.inverse)
+  let pawn_mask = source_bb
+  let promotion_piece_mask = target_bb
+  let promotion_bb_i = promotion_piece |> piece.index
 
-  let new_pawn_bitboard =
-    board
-    |> piece_bitboard(piece.Pawn)
-    |> int.bitwise_exclusive_or(source_bb)
-  let new_promotion_piece_bitboard =
-    board
-    |> piece_bitboard(promotion_piece)
-    |> int.bitwise_or(target_bb)
-  let promotion_bitboard_i = promotion_piece |> piece.index
-
-  let new_friendly_bitboard =
-    friendly_bitboard
-    |> int.bitwise_exclusive_or(int.bitwise_or(source_bb, target_bb))
-  let new_enemy_bitboard = case is_capture {
-    True -> enemy_bitboard |> int.bitwise_exclusive_or(target_i)
-    False -> enemy_bitboard
+  let friendly_bitboard_mask = int.bitwise_or(source_bb, target_bb)
+  let enemy_bitboard_mask = case is_capture {
+    True -> target_i
+    False -> 0
   }
 
-  let color_bitboards = case board.color {
-    color.White -> #(new_friendly_bitboard, new_enemy_bitboard)
-    color.Black -> #(new_enemy_bitboard, new_friendly_bitboard)
+  let #(captured_piece_mask, captured_bb_i) = case captured_piece {
+    Some(piece) -> #(target_bb, piece |> piece.index)
+    None -> #(0, -1)
   }
 
-  let new_captured_piece_bitboard = case captured_piece {
-    Some(captured_piece) -> {
-      case captured_piece == promotion_piece {
-        True -> new_promotion_piece_bitboard
-        False ->
-          board
-          |> piece_bitboard(captured_piece)
-          |> int.bitwise_exclusive_or(target_bb)
-      }
-    }
-    // Will be unused
-    None -> {
-      0
-    }
-  }
-
-  let captured_bitboard_i = case captured_piece {
-    Some(piece) -> piece |> piece.index
-    None -> -1
+  let #(friendly_bb_index, enemy_bb_index) = case board.color {
+    color.White -> #(6, 7)
+    color.Black -> #(7, 6)
   }
 
   let pieces =
     board.pieces
     |> glearray.to_list
     |> list.index_map(fn(bitboard, i) {
-      case i {
-        0 -> new_pawn_bitboard
-        i if i == promotion_bitboard_i -> new_promotion_piece_bitboard
-        i if i == captured_bitboard_i -> new_captured_piece_bitboard
-        6 -> color_bitboards.0
-        7 -> color_bitboards.1
-        _ -> bitboard
-      }
+      int.bitwise_exclusive_or(bitboard, case i {
+        0 -> pawn_mask
+        i if i == promotion_bb_i -> promotion_piece_mask
+        i if i == captured_bb_i -> captured_piece_mask
+        i if i == friendly_bb_index -> friendly_bitboard_mask
+        i if i == enemy_bb_index -> enemy_bitboard_mask
+        _ -> 0
+      })
     })
     |> glearray.from_list
+
+  let removed_castling_rights = case target {
+    square.H1 -> 0b0001
+    square.A1 -> 0b0010
+    square.H8 -> 0b0100
+    square.A8 -> 0b1000
+    _ -> 0
+  }
+  let castling_rights =
+    board.castling_rights
+    |> int.bitwise_and(int.bitwise_not(removed_castling_rights))
 
   Board(
     pieces: pieces,
     color: board.color |> color.inverse,
-    // TODO: Adjust castling rights if capturing a rook
-    castling_rights: board.castling_rights,
+    castling_rights: castling_rights,
     en_passant: None,
   )
 }
