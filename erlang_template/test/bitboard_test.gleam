@@ -2,7 +2,7 @@ import erlang_template/chess/board/bitboard
 import gleam/list
 import gleeunit/should
 
-pub fn bitboard_pop_lsb_test() {
+pub fn pop_lsb_test() {
   bitboard.pop_lsb(0b00101100)
   |> should.equal(0b00101000)
 
@@ -16,7 +16,7 @@ pub fn bitboard_pop_lsb_test() {
   |> should.equal(0b1111001001010)
 }
 
-pub fn bitboard_lsb_index_test() {
+pub fn lsb_index_test() {
   bitboard.lsb_index(0b11111000)
   |> should.equal(3)
 
@@ -33,7 +33,7 @@ pub fn bitboard_lsb_index_test() {
   |> should.equal(29)
 }
 
-pub fn bitboard_map_index_test() {
+pub fn map_index_test() {
   let indexes = bitboard.map_index(0b11010101, fn(i) { i })
   let expected = [0, 2, 4, 6, 7]
   indexes

@@ -11,7 +11,7 @@ import gleam/list
 import gleam/option.{None, Some}
 import gleeunit/should
 
-pub fn move_gen_pawn_moves_test() {
+pub fn pawn_moves_test() {
   let board =
     board.Board(
       pieces: fen.pieces(fen.starting_fen),
@@ -51,7 +51,7 @@ pub fn move_gen_pawn_moves_test() {
   testcase.0 |> should.equal(testcase.1)
 }
 
-pub fn move_gen_pawn_captures_test() {
+pub fn pawn_captures_test() {
   // Custom fen with many pawn captures / moves
   let pawn_test_fen =
     "rnbqkb1r/p1p1pppp/8/2PpP3/8/1p3P1n/PP1P2PP/RNBQKBNR w KQkq - 0 1"
@@ -112,7 +112,7 @@ pub fn move_gen_pawn_captures_test() {
   testcase.0 |> should.equal(testcase.1)
 }
 
-pub fn move_gen_sliding_targets_test() {
+pub fn sliding_targets_test() {
   let blockers = 0x8120012000140000
   let square = square.F6
 
@@ -130,7 +130,7 @@ pub fn move_gen_sliding_targets_test() {
   |> should.equal(expected_rook_moves)
 }
 
-pub fn move_gen_knight_moves_test() {
+pub fn knight_moves_test() {
   let move_tables = move_tables.new()
   let board =
     board.Board(

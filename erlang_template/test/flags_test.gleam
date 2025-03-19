@@ -3,7 +3,7 @@ import erlang_template/chess/board/piece
 import gleam/option.{None, Some}
 import gleeunit/should
 
-pub fn flags_new_test() {
+pub fn new_test() {
   flags.new(None, False, 0) |> should.equal(0b0000)
   flags.new(None, True, 0) |> should.equal(0b0100)
   flags.new(Some(piece.Knight), True, 0) |> should.equal(0b1100)

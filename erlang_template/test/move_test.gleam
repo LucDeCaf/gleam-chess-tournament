@@ -3,7 +3,7 @@ import erlang_template/chess/board/square
 import gleam/list
 import gleeunit/should
 
-pub fn move_new_test() {
+pub fn new_test() {
   let squares = [
     #(square.A1, square.C6),
     #(square.B1, square.H1),

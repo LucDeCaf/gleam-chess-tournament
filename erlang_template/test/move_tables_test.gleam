@@ -3,7 +3,7 @@ import erlang_template/chess/board/square
 import erlang_template/chess/move_gen/move_tables
 import gleeunit/should
 
-pub fn move_tables_en_passant_source_mask_test() {
+pub fn en_passant_source_mask_test() {
   let move_tables = move_tables.new()
   move_tables.en_passant_source_masks(square.E3, color.Black, move_tables)
   |> should.equal(0x28000000)
