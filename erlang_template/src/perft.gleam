@@ -1,5 +1,4 @@
 import erlang_template/chess/board
-import erlang_template/chess/fen
 import erlang_template/chess/move_gen
 import erlang_template/chess/move_gen/move_tables
 import gleam/int

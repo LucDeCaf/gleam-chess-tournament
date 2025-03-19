@@ -9,12 +9,7 @@ import erlang_template/chess/move_gen/move_tables
 import gleam/int
 import gleam/list
 import gleam/option.{None, Some}
-import gleeunit
 import gleeunit/should
-
-pub fn main() {
-  gleeunit.main()
-}
 
 pub fn move_gen_pawn_moves_test() {
   let board =

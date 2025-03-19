@@ -1,12 +1,7 @@
 import erlang_template/chess/board/flags
 import erlang_template/chess/board/piece
 import gleam/option.{None, Some}
-import gleeunit
 import gleeunit/should
-
-pub fn main() {
-  gleeunit.main()
-}
 
 pub fn flags_new_test() {
   flags.new(None, False, 0) |> should.equal(0b0000)
