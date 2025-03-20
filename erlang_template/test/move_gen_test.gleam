@@ -155,3 +155,46 @@ pub fn knight_moves_test() {
   |> list.zip(expected)
   |> list.each(fn(testcase) { testcase.0 |> should.equal(testcase.1) })
 }
+
+pub fn bishop_moves_test() {
+  let board = board.from_fen("n3k3/p7/1R1N2r1/2b5/1q2B3/3N4/2r3r1/4K2N w - -")
+  let bishop_moves_white =
+    board |> move_gen.bishop_moves |> list.sort(int.compare)
+
+  let board = board.from_fen("n3k3/p7/1R1N2r1/2b5/1q2B3/3N4/2r3r1/4K2N b - -")
+  let bishop_moves_black =
+    board |> move_gen.bishop_moves |> list.sort(int.compare)
+
+  let expected_moves_white =
+    [
+      move.new(square.E4, square.F5, 0),
+      move.new(square.E4, square.G6, flags.capture),
+      move.new(square.E4, square.F3, 0),
+      move.new(square.E4, square.G2, flags.capture),
+      move.new(square.E4, square.D5, 0),
+      move.new(square.E4, square.C6, 0),
+      move.new(square.E4, square.B7, 0),
+      move.new(square.E4, square.A8, flags.capture),
+    ]
+    |> list.sort(int.compare)
+  let expected_moves_black =
+    [
+      move.new(square.C5, square.B6, flags.capture),
+      move.new(square.C5, square.D6, flags.capture),
+      move.new(square.C5, square.D4, 0),
+      move.new(square.C5, square.E3, 0),
+      move.new(square.C5, square.F2, 0),
+      move.new(square.C5, square.G1, 0),
+    ]
+    |> list.sort(int.compare)
+
+  let white_tests = list.zip(bishop_moves_white, expected_moves_white)
+  // |> should.be_ok
+  let black_tests = list.zip(bishop_moves_black, expected_moves_black)
+  // |> should.be_ok
+
+  use tests <- list.each([white_tests, black_tests])
+  use test_case <- list.each(tests)
+  move.to_debug_string(test_case.0)
+  |> should.equal(move.to_debug_string(test_case.1))
+}
