@@ -308,3 +308,23 @@ pub fn kiwipete_captures_black_test() {
   move.to_debug_string(test_case.0)
   |> should.equal(move.to_debug_string(test_case.1))
 }
+
+pub fn en_passant_test() {
+  let tables = move_tables.new()
+  let board = board.from_fen("4k3/8/1p6/2PpPp2/8/8/8/4K3 w - d6")
+
+  let pawn_captures =
+    board |> move_gen.pawn_captures(tables) |> list.sort(int.compare)
+  let expected_captures =
+    [
+      move.new(square.C5, square.B6, flags.capture),
+      move.new(square.C5, square.D6, flags.capture),
+      move.new(square.E5, square.D6, flags.capture),
+    ]
+    |> list.sort(int.compare)
+
+  let test_cases = list.zip(expected_captures, pawn_captures)
+  use test_case <- list.each(test_cases)
+  move.to_debug_string(test_case.0)
+  |> should.equal(move.to_debug_string(test_case.1))
+}
