@@ -12,6 +12,8 @@ const white_piece_chars = ["P", "N", "B", "R", "Q", "K"]
 
 const black_piece_chars = ["p", "n", "b", "r", "q", "k"]
 
+// TODO: More efficient funcs from getting whole board from fen in one call
+
 pub fn pieces(fen: String) -> glearray.Array(Int) {
   let assert Ok(pieces) = fen |> string.split(" ") |> list.first
   pieces
