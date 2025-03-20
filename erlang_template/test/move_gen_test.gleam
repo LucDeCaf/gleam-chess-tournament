@@ -250,7 +250,61 @@ pub fn rook_moves_test() {
   |> should.equal(move.to_debug_string(test_case.1))
 }
 
-pub fn kiwipete_captures_test() {
-  let kiwipete_fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
+pub fn kiwipete_captures_white_test() {
+  let kiwipete_fen =
+    "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
   let board = board.from_fen(kiwipete_fen)
-} 
+  let tables = move_tables.new()
+
+  let expected_captures =
+    [
+      move.new(square.E2, square.A6, flags.capture),
+      move.new(square.D5, square.E6, flags.capture),
+      move.new(square.E5, square.G6, flags.capture),
+      move.new(square.E5, square.F7, flags.capture),
+      move.new(square.E5, square.D7, flags.capture),
+      move.new(square.G2, square.H3, flags.capture),
+      move.new(square.F3, square.H3, flags.capture),
+      move.new(square.F3, square.F6, flags.capture),
+    ]
+    |> list.sort(int.compare)
+  let captures =
+    board
+    |> move_gen.legal_moves(tables)
+    |> list.filter(fn(move) { int.bitwise_and(move, flags.capture) != 0 })
+    |> list.sort(int.compare)
+
+  let test_cases = list.zip(expected_captures, captures)
+  use test_case <- list.each(test_cases)
+  move.to_debug_string(test_case.0)
+  |> should.equal(move.to_debug_string(test_case.1))
+}
+
+pub fn kiwipete_captures_black_test() {
+  let kiwipete_fen =
+    "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R b KQkq -"
+  let board = board.from_fen(kiwipete_fen)
+  let tables = move_tables.new()
+
+  let expected_captures =
+    [
+      move.new(square.H3, square.G2, flags.capture),
+      move.new(square.F6, square.E4, flags.capture),
+      move.new(square.F6, square.D5, flags.capture),
+      move.new(square.E6, square.D5, flags.capture),
+      move.new(square.B6, square.D5, flags.capture),
+      move.new(square.B4, square.C3, flags.capture),
+      move.new(square.A6, square.E2, flags.capture),
+    ]
+    |> list.sort(int.compare)
+  let captures =
+    board
+    |> move_gen.legal_moves(tables)
+    |> list.filter(fn(move) { int.bitwise_and(move, flags.capture) != 0 })
+    |> list.sort(int.compare)
+
+  let test_cases = list.zip(expected_captures, captures)
+  use test_case <- list.each(test_cases)
+  move.to_debug_string(test_case.0)
+  |> should.equal(move.to_debug_string(test_case.1))
+}
