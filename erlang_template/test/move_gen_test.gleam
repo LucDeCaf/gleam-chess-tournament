@@ -249,3 +249,8 @@ pub fn rook_moves_test() {
   move.to_debug_string(test_case.0)
   |> should.equal(move.to_debug_string(test_case.1))
 }
+
+pub fn kiwipete_captures_test() {
+  let kiwipete_fen = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -"
+  let board = board.from_fen(kiwipete_fen)
+} 
