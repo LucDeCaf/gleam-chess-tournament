@@ -348,3 +348,36 @@ pub fn en_passant_black_test() {
   move.to_debug_string(test_case.0)
   |> should.equal(move.to_debug_string(test_case.1))
 }
+
+pub fn is_legal_move_test() {
+  let discovered_check_fen = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -"
+  let board = board.from_fen(discovered_check_fen)
+  let tables = move_tables.new()
+
+  let legal_moves =
+    board |> move_gen.legal_moves(tables) |> list.sort(int.compare)
+  // Moves generated with python-chess and custom script
+  let expected_moves =
+    [
+      move.new(square.A5, square.A6, 0),
+      move.new(square.A5, square.A4, 0),
+      move.new(square.B4, square.F4, 4),
+      move.new(square.B4, square.E4, 0),
+      move.new(square.B4, square.D4, 0),
+      move.new(square.B4, square.C4, 0),
+      move.new(square.B4, square.A4, 0),
+      move.new(square.B4, square.B3, 0),
+      move.new(square.B4, square.B2, 0),
+      move.new(square.B4, square.B1, 0),
+      move.new(square.G2, square.G3, 0),
+      move.new(square.E2, square.E3, 0),
+      move.new(square.G2, square.G4, 0),
+      move.new(square.E2, square.E4, 0),
+    ]
+    |> list.sort(int.compare)
+
+  let test_cases = list.zip(expected_moves, legal_moves)
+  use test_case <- list.each(test_cases)
+  move.to_debug_string(test_case.0)
+  |> should.equal(move.to_debug_string(test_case.1))
+}
