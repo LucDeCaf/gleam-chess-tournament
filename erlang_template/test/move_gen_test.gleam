@@ -188,10 +188,61 @@ pub fn bishop_moves_test() {
     ]
     |> list.sort(int.compare)
 
-  let white_tests = list.zip(bishop_moves_white, expected_moves_white)
-  // |> should.be_ok
-  let black_tests = list.zip(bishop_moves_black, expected_moves_black)
-  // |> should.be_ok
+  let white_tests =
+    list.strict_zip(bishop_moves_white, expected_moves_white)
+    |> should.be_ok
+  let black_tests =
+    list.strict_zip(bishop_moves_black, expected_moves_black)
+    |> should.be_ok
+
+  use tests <- list.each([white_tests, black_tests])
+  use test_case <- list.each(tests)
+  move.to_debug_string(test_case.0)
+  |> should.equal(move.to_debug_string(test_case.1))
+}
+
+pub fn rook_moves_test() {
+  let board = board.from_fen("3bkn2/8/8/N4rn1/1B1R2b1/8/5N2/3BK3 w - -")
+  let rook_moves_white = board |> move_gen.rook_moves |> list.sort(int.compare)
+
+  let board = board.from_fen("3bkn2/8/8/N4rn1/1B1R2b1/8/5N2/3BK3 b - -")
+  let rook_moves_black = board |> move_gen.rook_moves |> list.sort(int.compare)
+
+  let expected_moves_white =
+    [
+      move.new(square.D4, square.D3, 0),
+      move.new(square.D4, square.D2, 0),
+      move.new(square.D4, square.C4, 0),
+      move.new(square.D4, square.D5, 0),
+      move.new(square.D4, square.D6, 0),
+      move.new(square.D4, square.D7, 0),
+      move.new(square.D4, square.D8, flags.capture),
+      move.new(square.D4, square.E4, 0),
+      move.new(square.D4, square.F4, 0),
+      move.new(square.D4, square.G4, flags.capture),
+    ]
+    |> list.sort(int.compare)
+  let expected_moves_black =
+    [
+      move.new(square.F5, square.A5, flags.capture),
+      move.new(square.F5, square.B5, 0),
+      move.new(square.F5, square.C5, 0),
+      move.new(square.F5, square.D5, 0),
+      move.new(square.F5, square.E5, 0),
+      move.new(square.F5, square.F2, flags.capture),
+      move.new(square.F5, square.F3, 0),
+      move.new(square.F5, square.F4, 0),
+      move.new(square.F5, square.F6, 0),
+      move.new(square.F5, square.F7, 0),
+    ]
+    |> list.sort(int.compare)
+
+  let white_tests =
+    list.strict_zip(rook_moves_white, expected_moves_white)
+    |> should.be_ok
+  let black_tests =
+    list.strict_zip(rook_moves_black, expected_moves_black)
+    |> should.be_ok
 
   use tests <- list.each([white_tests, black_tests])
   use test_case <- list.each(tests)
