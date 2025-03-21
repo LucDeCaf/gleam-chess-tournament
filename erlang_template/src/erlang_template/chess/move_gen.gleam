@@ -6,9 +6,11 @@ import erlang_template/chess/board/move
 import erlang_template/chess/board/piece
 import erlang_template/chess/board/square
 import erlang_template/chess/move_gen/move_tables
+import gleam/bool
 import gleam/int
 import gleam/list
 import gleam/option.{None, Some}
+import gleam/result
 import glearray
 
 // TODO: Tests
@@ -87,6 +89,7 @@ pub fn pseudolegal_moves(board: board.Board, move_tables) -> List(move.Move) {
   let rook_moves = rook_moves(board)
   let queen_moves = queen_moves(board, move_tables)
   let king_moves = king_moves(board, move_tables)
+  let castling_moves = castling_moves(board, move_tables)
   let pawn_moves = pawn_straight_moves(board)
   let pawn_captures = pawn_captures(board, move_tables)
 
@@ -95,6 +98,7 @@ pub fn pseudolegal_moves(board: board.Board, move_tables) -> List(move.Move) {
   |> list.append(rook_moves)
   |> list.append(queen_moves)
   |> list.append(king_moves)
+  |> list.append(castling_moves)
   |> list.append(pawn_moves)
   |> list.append(pawn_captures)
 }
@@ -403,6 +407,97 @@ pub fn king_moves(board: board.Board, move_tables: move_tables.MoveTables) {
     move.new(source, target, flags.new(None, is_capture, 0))
   })
   |> list.flatten
+}
+
+pub fn castling_moves(board: board.Board, tables: move_tables.MoveTables) {
+  let can_kingside = can_castle_kingside(board, tables)
+  let can_queenside = can_castle_queenside(board, tables)
+
+  let kingside = case can_kingside {
+    True -> [
+      case board.color {
+        color.White -> move.new(square.E1, square.G1, flags.castle_kingside)
+        color.Black -> move.new(square.E8, square.G8, flags.castle_kingside)
+      },
+    ]
+    False -> []
+  }
+
+  let queenside = case can_queenside {
+    True -> [
+      case board.color {
+        color.White -> move.new(square.E1, square.C1, flags.castle_queenside)
+        color.Black -> move.new(square.E8, square.C8, flags.castle_queenside)
+      },
+    ]
+    False -> []
+  }
+
+  list.append(kingside, queenside)
+}
+
+fn can_castle_kingside(board: board.Board, tables) -> Bool {
+  can_castle(
+    board,
+    #(0b0001, 0b0100),
+    #([square.F1, square.G1], [square.F8, square.G8]),
+    tables,
+  )
+}
+
+fn can_castle_queenside(board: board.Board, tables) -> Bool {
+  can_castle(
+    board,
+    #(0b0010, 0b1000),
+    #([square.D1, square.C1, square.B1], [square.D8, square.C8, square.B8]),
+    tables,
+  )
+}
+
+/// Generic function for checking for castling validity in either direction (kingside or queenside)
+fn can_castle(
+  board: board.Board,
+  rights_masks: #(Int, Int),
+  blockers: #(List(square.Square), List(square.Square)),
+  tables,
+) {
+  // Must have valid castling rights
+  let rights_mask = case board.color {
+    color.White -> rights_masks.0
+    color.Black -> rights_masks.1
+  }
+  let has_kingside_right =
+    int.bitwise_and(board.castling_rights, rights_mask) != 0
+
+  use <- bool.guard(when: !has_kingside_right, return: False)
+
+  // Can't castle through pieces
+  let blockers = case board.color {
+    color.White -> blockers.0
+    color.Black -> blockers.1
+  }
+
+  use <- bool.guard(when: squares_empty(board, blockers), return: False)
+
+  // Can't castle into / out of / through check
+  let enemy_color = board.color |> color.inverse
+  let king_square = case board.color {
+    color.White -> square.E1
+    color.Black -> square.E8
+  }
+  let castle_squares = [king_square, ..blockers]
+
+  use castle_square <- list.all(castle_squares)
+  board |> square_attacked_by(castle_square, enemy_color, tables)
+}
+
+fn squares_empty(board, squares) {
+  let mask =
+    squares
+    |> list.map(square.bitboard)
+    |> list.fold(0, int.bitwise_or)
+
+  int.bitwise_and(board.all_pieces(board), mask) == 0
 }
 
 // TODO: Optimise to not have to play the move to check if it is legal

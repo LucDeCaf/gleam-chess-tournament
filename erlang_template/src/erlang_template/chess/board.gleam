@@ -29,6 +29,15 @@ pub fn color_bitboard(board: Board, color: color.Color) {
   bitboard
 }
 
+pub fn has_kingside_castling_rights(board: Board, color) {
+  board.castling_rights
+  |> int.bitwise_and(case color {
+    color.White -> 0b0001
+    color.Black -> 0b0100
+  })
+  != 0
+}
+
 pub fn all_pieces(board: Board) {
   let assert Ok(white) = board.pieces |> glearray.get(6)
   let assert Ok(black) = board.pieces |> glearray.get(7)
@@ -74,7 +83,17 @@ pub fn make_move(on board: Board, play move: move.Move) -> Board {
     }
 
     None -> {
-      let assert Some(moved_piece) = board |> piece_at(source)
+      let moved_piece = case board |> piece_at(source) {
+        Some(piece) -> piece
+        None ->
+          panic as {
+            "no piece found at "
+            <> square.to_string(source)
+            <> " ("
+            <> move.to_debug_string(move)
+            <> ")"
+          }
+      }
 
       let source_i = source |> square.index
       let target_i = target |> square.index
