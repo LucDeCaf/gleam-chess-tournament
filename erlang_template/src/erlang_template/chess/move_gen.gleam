@@ -63,7 +63,6 @@ pub fn attacks_to(
   |> int.bitwise_or(attacking_bishops_queens)
 }
 
-// TODO: Tests
 pub fn square_attacked_by(
   board: board.Board,
   square: square.Square,
@@ -77,9 +76,9 @@ pub fn square_attacked_by(
 }
 
 pub fn legal_moves(board, move_tables) -> List(move.Move) {
-  list.filter(pseudolegal_moves(board, move_tables), fn(move) {
-    is_legal_move(board, move, move_tables)
-  })
+  let all_moves = pseudolegal_moves(board, move_tables)
+  use move <- list.filter(all_moves)
+  is_legal_move(board, move, move_tables)
 }
 
 pub fn pseudolegal_moves(board: board.Board, move_tables) -> List(move.Move) {
@@ -407,20 +406,21 @@ pub fn king_moves(board: board.Board, move_tables: move_tables.MoveTables) {
 }
 
 // TODO: Optimise to not have to play the move to check if it is legal
-// TODO: Tests
 pub fn is_legal_move(
   board: board.Board,
   move: move.Move,
-  move_tables: move_tables.MoveTables,
+  tables: move_tables.MoveTables,
 ) -> Bool {
-  let post_move = board |> board.make_move(move)
+  let board_after_move = board |> board.make_move(move)
   let king_square =
-    post_move
+    board_after_move
     |> board.bitboard(piece.King, board.color)
-    |> bitboard.pop_lsb
+    |> bitboard.lsb_index
     |> square.from_index_unchecked
 
-  !{
-    post_move |> square_attacked_by(king_square, post_move.color, move_tables)
-  }
+  let king_can_be_captured =
+    board_after_move
+    |> square_attacked_by(king_square, board_after_move.color, tables)
+
+  !king_can_be_captured
 }

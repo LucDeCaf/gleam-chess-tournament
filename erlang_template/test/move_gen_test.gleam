@@ -7,6 +7,7 @@ import erlang_template/chess/fen
 import erlang_template/chess/move_gen
 import erlang_template/chess/move_gen/move_tables
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import gleeunit/should
@@ -380,4 +381,44 @@ pub fn is_legal_move_test() {
   use test_case <- list.each(test_cases)
   move.to_debug_string(test_case.0)
   |> should.equal(move.to_debug_string(test_case.1))
+}
+
+pub fn null_move_position_test() {
+  let fen = "2q1rr1k/3bbnnp/p2p1pp1/2pPp3/PpP1P1P1/1P2BNNP/2BQ1PRK/7R b - -"
+  let board = board.from_fen(fen)
+  let tables = move_tables.new()
+
+  let moves = board |> move_gen.legal_moves(tables)
+  io.debug(moves)
+}
+
+pub fn square_attacked_by_test() {
+  let tables = move_tables.new()
+  let fen = "2q1rr1k/3bbnnp/p2p1pp1/2pPp3/PpP1P1P1/1P2BNNP/2BQ1PRK/7R b - -"
+  let board = board.from_fen(fen)
+
+  let cases = [
+    #(square.A2, color.White, False),
+    #(square.A2, color.Black, False),
+    #(square.A7, color.White, False),
+    #(square.A7, color.Black, False),
+    #(square.B5, color.White, True),
+    #(square.B5, color.Black, True),
+    #(square.B7, color.White, False),
+    #(square.B7, color.Black, True),
+    #(square.C4, color.White, True),
+    #(square.C4, color.Black, False),
+    #(square.F4, color.White, True),
+    #(square.F4, color.Black, True),
+    #(square.G8, color.White, False),
+    #(square.G8, color.Black, True),
+    #(square.H2, color.White, True),
+    #(square.H2, color.Black, False),
+    #(square.H8, color.White, False),
+    #(square.H8, color.Black, True),
+  ]
+
+  use test_case <- list.each(cases)
+  move_gen.square_attacked_by(board, test_case.0, test_case.1, tables)
+  |> should.equal(test_case.2)
 }
