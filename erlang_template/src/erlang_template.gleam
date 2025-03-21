@@ -34,6 +34,7 @@ fn handle_request(request: Request, ctx: context.Context) -> Response {
   case wisp.path_segments(request) {
     ["move"] -> handle_move(request, ctx)
     ["perft"] -> handle_perft(request, ctx)
+    ["divide"] -> handle_divide(request, ctx)
     _ -> wisp.ok()
   }
 }
@@ -76,6 +77,24 @@ fn handle_perft(request: Request, ctx: context.Context) -> Response {
       let board = board.from_fen(fen)
       let perft_result = perft.perft(board, depth, ctx.move_tables)
       wisp.ok() |> wisp.string_body(int.to_string(perft_result))
+    }
+  }
+}
+
+fn handle_divide(request: Request, ctx: context.Context) {
+  use body <- wisp.require_string_body(request)
+  let decode_result = json.parse(body, perft_decoder())
+  case decode_result {
+    Error(_) -> wisp.bad_request()
+    Ok(#(fen, depth)) -> {
+      let board = board.from_fen(fen)
+      let divide_result = perft.divide(board, depth, ctx.move_tables)
+      let json =
+        divide_result
+        |> json.dict(fn(str) { str }, json.int)
+        |> json.to_string_tree
+
+      wisp.json_response(json, 200)
     }
   }
 }

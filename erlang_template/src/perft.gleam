@@ -1,6 +1,8 @@
 import erlang_template/chess/board
+import erlang_template/chess/board/move
 import erlang_template/chess/move_gen
 import erlang_template/chess/move_gen/move_tables
+import gleam/dict
 import gleam/int
 import gleam/list
 
@@ -29,4 +31,16 @@ pub fn perft(
       subposition_move_count
     }
   }
+}
+
+pub fn divide(board: board.Board, depth: Int, tables: move_tables.MoveTables) {
+  let moves = move_gen.legal_moves(board, tables)
+  moves
+  |> list.map(fn(move) {
+    let board = board |> board.make_move(move)
+    let count = perft(board, depth - 1, tables)
+
+    #(move |> move.to_string, count)
+  })
+  |> dict.from_list
 }
