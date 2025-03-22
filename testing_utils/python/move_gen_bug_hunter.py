@@ -1,10 +1,30 @@
 import chess
 import requests
 
-start_fen = input('Enter fen: ')
+DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
+
+start_fen = input('Enter fen (leave blank for starting position): ')
+if start_fen == "":
+    start_fen = DEFAULT_FEN
 perft_depth = int(input("Enter perft depth: "))
 
 board = chess.Board(start_fen)
+
+
+def perft(board: chess.Board, depth: int):
+    if depth == 0:
+        return 1
+    if depth == 1:
+        return board.legal_moves.count()
+
+    count = 0
+
+    for move in board.legal_moves:
+        board.push(move)
+        count += perft(board, depth - 1)
+        board.pop()
+
+    return count
 
 
 def move_diffs(board: chess.Board, perft_depth=1):
@@ -15,31 +35,42 @@ def move_diffs(board: chess.Board, perft_depth=1):
     }
 
     # Response will look like { "a1a1": 1234, "a1a2": 5768, ... }
-    response = requests.post("http://localhost:8000/divide", json=request_body)
+    generated_move_perfts = requests.post(
+        "http://localhost:8000/divide",
+        json=request_body
+    ).json()
 
-    generated_move_results = response.json()
-    generated_moves = generated_move_results.keys()
-    actual_moves = list(board.legal_moves)
+    # ["a1a1", "a1a2", ...]
+    generated_moves = generated_move_perfts.keys()
+
+    # ["a1a1", "a1a2", ...]
+    actual_moves = [move.uci() for move in board.legal_moves]
+
+    # Same format as above generated_move_perfts
+    actual_move_perfts = {}
+    for uci in actual_moves:
+        board.push(chess.Move.from_uci(uci))
+        actual_move_perfts[uci] = perft(board, perft_depth - 1)
+        board.pop()
 
     gen_move_set = set(generated_moves)
-    act_move_set = set([move.uci() for move in actual_moves])
+    act_move_set = set(actual_moves)
 
     missing_moves = act_move_set.difference(gen_move_set)
     extra_moves = gen_move_set.difference(act_move_set)
-    found_moves = act_move_set.intersection(gen_move_set)
+    shared_moves = act_move_set.intersection(gen_move_set)
 
-    comparison_results = {}
-    for uci in found_moves:
-        board.push(chess.Move.from_uci(uci))
-        generated_count = generated_move_results[uci]
-        actual_count = len(list(board.legal_moves))
-        comparison_results[uci] = generated_count - actual_count
-        board.pop()
+    missing_results = {
+        move: actual_move_perfts[move] for move in missing_moves}
+    extra_results = {
+        move: generated_move_perfts[move] for move in extra_moves}
+    shared_results = {
+        move: generated_move_perfts[uci] - actual_move_perfts[uci] for move in shared_moves}
 
     return {
-        "shared": list(found_moves),
-        "not_found": list(missing_moves),
-        "illegal": list(extra_moves)
+        "shared": shared_results,
+        "missing": missing_results,
+        "illegal": extra_results,
     }
 
 
