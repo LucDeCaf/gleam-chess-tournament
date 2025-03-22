@@ -1,4 +1,5 @@
 import chess
+import json
 import requests
 
 DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
@@ -74,4 +75,35 @@ def move_diffs(board: chess.Board, perft_depth=1):
     }
 
 
-print(move_diffs(board, perft_depth))
+# Error detection
+MAX_DEPTH = 8
+
+
+def main():
+    results = move_diffs(board, perft_depth)
+
+    if len(results["illegal"]) > 0:
+        print("--- Illegal moves found ---")
+        print("FEN: " + board.fen())
+        print("Moves: " + json.dumps(results["shared"]))
+        return
+
+    if len(results["missing"]) > 0:
+        print("--- Missing moves found ---")
+        print("FEN: " + board.fen())
+        print("Moves: " + json.dumps(results["missing"]))
+        return
+
+    discrepancies = {key: value for key,
+                     value in results["shared"].items() if value != 0}
+
+    if len(discrepancies) > 0:
+        print("--- Discrepancies found ---")
+        print("Discrepancies: " + json.dumps(discrepancies))
+        return
+
+    print("No errors found.")
+
+
+if __name__ == '__main__':
+    main()
