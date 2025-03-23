@@ -43,8 +43,32 @@ pub fn castle_test() {
   |> should.equal(0x1000000000000004)
 }
 
+pub fn en_passant_white_test() {
+  let board = board.from_fen("4k3/2p5/8/3P4/4p3/8/5P2/4K3 w - -")
+  let board =
+    board |> board.make_move(move.new(square.F2, square.F4, flags.double_move))
+  let board =
+    board |> board.make_move(move.new(square.E4, square.F3, flags.en_passant))
+
+  board |> board.piece_bitboard(piece.Pawn) |> should.equal(0x4000800200000)
+  board |> board.color_bitboard(color.White) |> should.equal(0x800000010)
+  board |> board.color_bitboard(color.Black) |> should.equal(0x1004000000200000)
+}
+
+pub fn en_passant_black_test() {
+  let board = board.from_fen("4k3/2p5/8/3P4/4p3/8/5P2/4K3 b - -")
+  let board =
+    board |> board.make_move(move.new(square.C7, square.C5, flags.double_move))
+  let board =
+    board |> board.make_move(move.new(square.D5, square.C6, flags.en_passant))
+
+  board |> board.piece_bitboard(piece.Pawn) |> should.equal(0x40010002000)
+  board |> board.color_bitboard(color.White) |> should.equal(0x40000002010)
+  board |> board.color_bitboard(color.Black) |> should.equal(0x1000000010000000)
+}
+
 pub fn double_move_ep_square_test() {
-  let board = board.from_fen("4k3/2p5/8/3P4/4p3/8/5P2/4K3 w - - 0 1")
+  let board = board.from_fen("4k3/2p5/8/3P4/4p3/8/5P2/4K3 w - -")
 
   let board =
     board
