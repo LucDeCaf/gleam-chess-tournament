@@ -81,24 +81,25 @@ MAX_DEPTH = 8
 
 def main():
     results = move_diffs(board, perft_depth)
+    no_errors = True
 
     if len(results["illegal"]) > 0:
-        print("--- Illegal moves found ---")
+        print("\n--- Illegal moves found ---")
         print("FEN: " + board.fen())
         print("Moves: " + json.dumps(results["shared"]))
-        return
+        no_errors = False
 
     if len(results["missing"]) > 0:
-        print("--- Missing moves found ---")
+        print("\n--- Missing moves found ---")
         print("FEN: " + board.fen())
         print("Moves: " + json.dumps(results["missing"]))
-        return
+        no_errors = False
 
     discrepancies = {key: value for key,
                      value in results["shared"].items() if value != 0}
 
     if len(discrepancies) > 0:
-        print("--- Discrepancies found ---")
+        print("\n--- Discrepancies found ---")
 
         # TODO: For each discrepancy, play the move, get the diffs, keep a running
         # TODO: total of extra / missing moves, and continue until the total equals
@@ -108,9 +109,10 @@ def main():
             pass
 
         print("Discrepancies: " + json.dumps(discrepancies))
-        return
+        no_errors = False
 
-    print("No errors found.")
+    if no_errors:
+        print("No errors found.")
 
 
 if __name__ == '__main__':
