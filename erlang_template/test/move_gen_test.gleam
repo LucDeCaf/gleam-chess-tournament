@@ -43,12 +43,6 @@ pub fn pawn_moves_test() {
     |> list.sort(int.compare)
 
   use testcase <- list.each(list.zip(moves, expected_moves))
-  // io.debug(
-  //   "expected "
-  //   <> move.to_debug_string(testcase.1)
-  //   <> ", got "
-  //   <> move.to_debug_string(testcase.0),
-  // )
   testcase.0 |> should.equal(testcase.1)
 }
 
@@ -104,12 +98,6 @@ pub fn pawn_captures_test() {
   let black_testcases = list.zip(moves, expected_moves)
 
   use testcase <- list.each(list.append(white_testcases, black_testcases))
-  // io.debug(
-  //   "expected "
-  //   <> move.to_debug_string(testcase.1)
-  //   <> ", got "
-  //   <> move.to_debug_string(testcase.0),
-  // )
   testcase.0 |> should.equal(testcase.1)
 }
 
@@ -381,15 +369,6 @@ pub fn is_legal_move_test() {
   use test_case <- list.each(test_cases)
   move.to_debug_string(test_case.0)
   |> should.equal(move.to_debug_string(test_case.1))
-}
-
-pub fn null_move_position_test() {
-  let fen = "2q1rr1k/3bbnnp/p2p1pp1/2pPp3/PpP1P1P1/1P2BNNP/2BQ1PRK/7R b - -"
-  let board = board.from_fen(fen)
-  let tables = move_tables.new()
-
-  let moves = board |> move_gen.legal_moves(tables)
-  io.debug(moves)
 }
 
 pub fn square_attacked_by_test() {
