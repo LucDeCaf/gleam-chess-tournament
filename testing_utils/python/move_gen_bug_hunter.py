@@ -4,7 +4,7 @@ import requests
 
 DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-start_fen = input('Enter fen (leave blank for starting position): ')
+start_fen = input('Enter fen (leave blank for starting position): ').strip()
 if start_fen == "":
     start_fen = DEFAULT_FEN
 perft_depth = int(input("Enter perft depth: "))
@@ -96,7 +96,7 @@ def main():
         no_errors = False
 
     discrepancies: dict[str, any] = {key: value for key,
-                     value in results["shared"].items() if value != 0}
+                                     value in results["shared"].items() if value != 0}
 
     if len(discrepancies) > 0:
         print("\n--- Discrepancies found ---")
@@ -120,7 +120,7 @@ def main():
 
             board.pop()
 
-        # print("Discrepancies: " + json.dumps(discrepancies))
+        print("Discrepancies: " + json.dumps(discrepancies))
         no_errors = False
 
     if no_errors:

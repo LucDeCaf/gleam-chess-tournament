@@ -4,9 +4,9 @@ import erlang_template/chess/board/flags
 import erlang_template/chess/board/move
 import erlang_template/chess/board/piece
 import erlang_template/chess/board/square
+import gleam/option.{Some}
 import gleeunit/should
 
-// TODO: Why is castling seemingly broken ughhhhhhh
 pub fn castle_test() {
   // Kiwipete
   let board =
@@ -41,4 +41,19 @@ pub fn castle_test() {
   post_white_queenside
   |> board.piece_bitboard(piece.King)
   |> should.equal(0x1000000000000004)
+}
+
+pub fn double_move_ep_square_test() {
+  let board = board.from_fen("4k3/2p5/8/3P4/4p3/8/5P2/4K3 w - - 0 1")
+
+  let board =
+    board
+    |> board.make_move(move.new(square.F2, square.F4, flags.double_move))
+  board.en_passant
+  |> should.equal(Some(square.F3))
+
+  let board =
+    board |> board.make_move(move.new(square.C7, square.C5, flags.double_move))
+  board.en_passant
+  |> should.equal(Some(square.C6))
 }

@@ -382,7 +382,7 @@ fn en_passant_square(source) {
   let source_i = source |> square.index
   case source_i |> square.rank {
     1 -> source_i + 8 |> square.from_index |> option.from_result
-    6 -> source_i - 1 |> square.from_index |> option.from_result
+    6 -> source_i - 8 |> square.from_index |> option.from_result
     _ -> None
   }
 }

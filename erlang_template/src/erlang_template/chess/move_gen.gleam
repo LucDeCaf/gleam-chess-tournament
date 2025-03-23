@@ -473,6 +473,7 @@ fn can_castle_kingside(board: board.Board, tables) -> Bool {
     board,
     #(0b0001, 0b0100),
     #([square.F1, square.G1], [square.F8, square.G8]),
+    #([square.F1, square.G1], [square.F8, square.G8]),
     tables,
   )
 }
@@ -482,6 +483,7 @@ fn can_castle_queenside(board: board.Board, tables) -> Bool {
     board,
     #(0b0010, 0b1000),
     #([square.D1, square.C1, square.B1], [square.D8, square.C8, square.B8]),
+    #([square.D1, square.C1], [square.D8, square.C8]),
     tables,
   )
 }
@@ -491,6 +493,7 @@ fn can_castle(
   board: board.Board,
   rights_masks: #(Int, Int),
   blockers: #(List(square.Square), List(square.Square)),
+  check_squares: #(List(square.Square), List(square.Square)),
   tables,
 ) {
   // Must have valid castling rights
@@ -517,7 +520,11 @@ fn can_castle(
     color.White -> square.E1
     color.Black -> square.E8
   }
-  let castle_squares = [king_square, ..blockers]
+  let check_squares = case board.color {
+    color.White -> check_squares.0
+    color.Black -> check_squares.1
+  }
+  let castle_squares = [king_square, ..check_squares]
 
   use castle_square <- list.all(castle_squares)
   !{ board |> square_attacked_by(castle_square, enemy_color, tables) }
