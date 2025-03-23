@@ -195,10 +195,10 @@ fn handle_promotion(
 // TODO: Tests
 fn handle_castle(board: Board, target: square.Square) -> Board {
   let #(source, rook_mask, removed_castling_right) = case target {
-    square.G1 -> #(square.E1, 0xa0, 0b0001)
-    square.C1 -> #(square.E1, 0x9, 0b0010)
-    square.G8 -> #(square.E8, 0xa000000000000000, 0b0100)
-    square.C8 -> #(square.E8, 0x900000000000000, 0b1000)
+    square.G1 -> #(square.E1, 0xa0, 0b0011)
+    square.C1 -> #(square.E1, 0x9, 0b0011)
+    square.G8 -> #(square.E8, 0xa000000000000000, 0b1100)
+    square.C8 -> #(square.E8, 0x900000000000000, 0b1100)
     _ -> panic as { "invalid castling target: " <> square.to_string(target) }
   }
 
