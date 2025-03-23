@@ -95,7 +95,7 @@ def main():
         print("Moves: " + json.dumps(results["missing"]))
         no_errors = False
 
-    discrepancies = {key: value for key,
+    discrepancies: dict[str, any] = {key: value for key,
                      value in results["shared"].items() if value != 0}
 
     if len(discrepancies) > 0:
@@ -106,9 +106,21 @@ def main():
         # TODO: the discrepancy amount.
 
         for discrepancy in discrepancies.keys():
-            pass
+            print("Checking " + discrepancy + ":")
+            board.push(chess.Move.from_uci(discrepancy))
+            results = move_diffs(board, perft_depth - 1)
 
-        print("Discrepancies: " + json.dumps(discrepancies))
+            if len(results["illegal"]) > 0:
+                print("ILLEGAL FOUND")
+                print(results["illegal"])
+
+            if len(results["missing"]) > 0:
+                print("MISSING FOUND")
+                print(results["missing"])
+
+            board.pop()
+
+        # print("Discrepancies: " + json.dumps(discrepancies))
         no_errors = False
 
     if no_errors:
