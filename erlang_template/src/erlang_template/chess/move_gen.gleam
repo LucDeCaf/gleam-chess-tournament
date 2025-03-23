@@ -469,21 +469,21 @@ pub fn castling_moves(board: board.Board, tables: move_tables.MoveTables) {
 }
 
 fn can_castle_kingside(board: board.Board, tables) -> Bool {
-  io.debug(can_castle(
+  can_castle(
     board,
     #(0b0001, 0b0100),
     #([square.F1, square.G1], [square.F8, square.G8]),
     tables,
-  ))
+  )
 }
 
 fn can_castle_queenside(board: board.Board, tables) -> Bool {
-  io.debug(can_castle(
+  can_castle(
     board,
     #(0b0010, 0b1000),
     #([square.D1, square.C1, square.B1], [square.D8, square.C8, square.B8]),
     tables,
-  ))
+  )
 }
 
 /// Generic function for checking for castling validity in either direction (kingside or queenside)
