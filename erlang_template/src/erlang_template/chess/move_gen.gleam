@@ -10,10 +10,9 @@ import gleam/bool
 import gleam/int
 import gleam/list
 import gleam/option.{None, Some}
-import gleam/result
 import glearray
 
-// TODO: Tests
+// TODO: Use guard clauses to prevent calling movetables funcs unnecessarily
 pub fn attacks_to(
   board: board.Board,
   square: square.Square,
@@ -31,12 +30,13 @@ pub fn attacks_to(
 
   let square_i = square |> square.index
   let assert Ok(knight_attacks) =
-    move_tables.knight_table |> glearray.get(square_i)
-  let assert Ok(king_attacks) = move_tables.king_table |> glearray.get(square_i)
+    move_tables.knight_table() |> glearray.get(square_i)
+  let assert Ok(king_attacks) =
+    move_tables.king_table() |> glearray.get(square_i)
   let assert Ok(white_pawn_attacks) =
-    move_tables.white_pawn_capture_table |> glearray.get(square_i)
+    move_tables.white_pawn_capture_table() |> glearray.get(square_i)
   let assert Ok(black_pawn_attacks) =
-    move_tables.black_pawn_capture_table |> glearray.get(square_i)
+    move_tables.black_pawn_capture_table() |> glearray.get(square_i)
 
   let blockers = board |> board.all_pieces
   let rook_queen_attacks =
@@ -117,7 +117,8 @@ pub fn knight_moves(
   |> bitboard.map_index(fn(source_i) {
     let source = square.from_index_unchecked(source_i)
 
-    let assert Ok(targets) = move_tables.knight_table |> glearray.get(source_i)
+    let assert Ok(targets) =
+      move_tables.knight_table() |> glearray.get(source_i)
     let valid_targets = targets |> int.bitwise_and(not_friendly_pieces)
 
     use target_i <- bitboard.map_index(valid_targets)
@@ -328,8 +329,8 @@ pub fn pawn_captures(
     bitboard.map_index(pawns, fn(source_i) {
       let assert Ok(targets) =
         case board.color {
-          color.White -> move_tables.white_pawn_capture_table
-          color.Black -> move_tables.black_pawn_capture_table
+          color.White -> move_tables.white_pawn_capture_table()
+          color.Black -> move_tables.black_pawn_capture_table()
         }
         |> glearray.get(source_i)
       let valid_targets = targets |> int.bitwise_and(enemies)
@@ -392,7 +393,7 @@ pub fn king_moves(board: board.Board, move_tables: move_tables.MoveTables) {
   |> bitboard.map_index(fn(source_i) {
     let source = square.from_index_unchecked(source_i)
 
-    let assert Ok(targets) = move_tables.king_table |> glearray.get(source_i)
+    let assert Ok(targets) = move_tables.king_table() |> glearray.get(source_i)
     let valid_targets = targets |> int.bitwise_and(not_friendly_pieces)
 
     use target_i <- bitboard.map_index(valid_targets)
