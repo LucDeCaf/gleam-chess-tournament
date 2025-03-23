@@ -10,9 +10,7 @@ import gleam/bool
 import gleam/int
 import gleam/list
 import gleam/option.{None, Some}
-import glearray
 
-// TODO: Use guard clauses to prevent calling movetables funcs unnecessarily
 pub fn attacks_to(
   board: board.Board,
   square: square.Square,
@@ -28,15 +26,10 @@ pub fn attacks_to(
   let white_pawns = board |> board.bitboard(piece.Pawn, color.White)
   let black_pawns = board |> board.bitboard(piece.Pawn, color.Black)
 
-  let square_i = square |> square.index
-  let assert Ok(knight_attacks) =
-    move_tables.knight_table() |> glearray.get(square_i)
-  let assert Ok(king_attacks) =
-    move_tables.king_table() |> glearray.get(square_i)
-  let assert Ok(white_pawn_attacks) =
-    move_tables.white_pawn_capture_table() |> glearray.get(square_i)
-  let assert Ok(black_pawn_attacks) =
-    move_tables.black_pawn_capture_table() |> glearray.get(square_i)
+  let knight_attacks = move_tables.knight_targets(square)
+  let king_attacks = move_tables.king_targets(square)
+  let white_pawn_attacks = move_tables.white_pawn_capture_targets(square)
+  let black_pawn_attacks = move_tables.black_pawn_capture_targets(square)
 
   let blockers = board |> board.all_pieces
   let rook_queen_attacks =
@@ -65,16 +58,57 @@ pub fn attacks_to(
   |> int.bitwise_or(attacking_bishops_queens)
 }
 
+// TODO: Optimise with guard clauses
 pub fn square_attacked_by(
   board: board.Board,
   square: square.Square,
   color: color.Color,
-  move_tables: move_tables.MoveTables,
+  tables: move_tables.MoveTables,
 ) -> Bool {
-  board
-  |> attacks_to(square, move_tables)
-  |> int.bitwise_and(board |> board.color_bitboard(color))
-  != 0
+  // Knights and kings are cheapest to check
+  let enemy_knights = board |> board.bitboard(piece.Knight, color)
+  let knights = tables.knight_targets(square) |> int.bitwise_and(enemy_knights)
+  use <- bool.guard(when: knights != 0, return: True)
+
+  let enemy_kings = board |> board.bitboard(piece.Knight, color)
+  let kings = tables.knight_targets(square) |> int.bitwise_and(enemy_kings)
+  use <- bool.guard(when: kings != 0, return: True)
+
+  // Pawns are next cheapest
+  let enemy_pawns = board |> board.bitboard(piece.Pawn, color)
+  let pawns =
+    case color {
+      color.White -> tables.black_pawn_capture_targets(square)
+      color.Black -> tables.white_pawn_capture_targets(square)
+    }
+    |> int.bitwise_and(enemy_pawns)
+  use <- bool.guard(when: pawns != 0, return: True)
+
+  // Diagonal attackers (bishops and queens)
+  let enemy_bishops = board |> board.bitboard(piece.Bishop, color)
+  let enemy_queens = board |> board.bitboard(piece.Queen, color)
+  let enemy_diagonals = enemy_bishops |> int.bitwise_or(enemy_queens)
+  let blockers = board |> board.all_pieces
+
+  let diagonals =
+    move_tables.sliding_targets(
+      square,
+      blockers,
+      move_tables.bishop_move_shifts,
+    )
+    |> int.bitwise_and(enemy_diagonals)
+  use <- bool.guard(when: diagonals != 0, return: True)
+
+  // Horizontal attackers (rooks and queens)
+  let enemy_rooks = board |> board.bitboard(piece.Rook, color)
+  let enemy_horizontals = enemy_rooks |> int.bitwise_or(enemy_queens)
+
+  let horizontals =
+    move_tables.sliding_targets(square, blockers, move_tables.rook_move_shifts)
+    |> int.bitwise_and(enemy_horizontals)
+  use <- bool.guard(when: horizontals != 0, return: True)
+
+  False
 }
 
 pub fn legal_moves(board, move_tables) -> List(move.Move) {
@@ -103,7 +137,6 @@ pub fn pseudolegal_moves(board: board.Board, move_tables) -> List(move.Move) {
   |> list.append(pawn_captures)
 }
 
-// TODO: Test movegen funcs using kiwipete to ensure captures work properly
 pub fn knight_moves(
   board: board.Board,
   move_tables: move_tables.MoveTables,
@@ -117,8 +150,7 @@ pub fn knight_moves(
   |> bitboard.map_index(fn(source_i) {
     let source = square.from_index_unchecked(source_i)
 
-    let assert Ok(targets) =
-      move_tables.knight_table() |> glearray.get(source_i)
+    let targets = move_tables.knight_targets(source)
     let valid_targets = targets |> int.bitwise_and(not_friendly_pieces)
 
     use target_i <- bitboard.map_index(valid_targets)
@@ -327,12 +359,11 @@ pub fn pawn_captures(
   // Captures
   let moves =
     bitboard.map_index(pawns, fn(source_i) {
-      let assert Ok(targets) =
-        case board.color {
-          color.White -> move_tables.white_pawn_capture_table()
-          color.Black -> move_tables.black_pawn_capture_table()
-        }
-        |> glearray.get(source_i)
+      let source = square.from_index_unchecked(source_i)
+      let targets = case board.color {
+        color.White -> move_tables.white_pawn_capture_targets(source)
+        color.Black -> move_tables.black_pawn_capture_targets(source)
+      }
       let valid_targets = targets |> int.bitwise_and(enemies)
 
       let is_promotion =
@@ -347,7 +378,6 @@ pub fn pawn_captures(
         True -> {
           valid_targets
           |> bitboard.map_index(fn(target_i) {
-            let source = square.from_index_unchecked(source_i)
             let target = square.from_index_unchecked(target_i)
             use piece <- list.map(piece.valid_promotion_pieces)
             move.new(source, target, flags.new(Some(piece), False, 0))
@@ -393,7 +423,7 @@ pub fn king_moves(board: board.Board, move_tables: move_tables.MoveTables) {
   |> bitboard.map_index(fn(source_i) {
     let source = square.from_index_unchecked(source_i)
 
-    let assert Ok(targets) = move_tables.king_table() |> glearray.get(source_i)
+    let targets = move_tables.king_targets(source)
     let valid_targets = targets |> int.bitwise_and(not_friendly_pieces)
 
     use target_i <- bitboard.map_index(valid_targets)

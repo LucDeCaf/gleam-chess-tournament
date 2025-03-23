@@ -108,12 +108,12 @@ const king_moves = [
 
 pub type MoveTables {
   MoveTables(
-    white_pawn_table: fn() -> glearray.Array(Int),
-    black_pawn_table: fn() -> glearray.Array(Int),
-    white_pawn_capture_table: fn() -> glearray.Array(Int),
-    black_pawn_capture_table: fn() -> glearray.Array(Int),
-    knight_table: fn() -> glearray.Array(Int),
-    king_table: fn() -> glearray.Array(Int),
+    white_pawn_targets: fn(square.Square) -> Int,
+    black_pawn_targets: fn(square.Square) -> Int,
+    white_pawn_capture_targets: fn(square.Square) -> Int,
+    black_pawn_capture_targets: fn(square.Square) -> Int,
+    knight_targets: fn(square.Square) -> Int,
+    king_targets: fn(square.Square) -> Int,
   )
 }
 
@@ -123,6 +123,13 @@ pub const bishop_move_shifts = [-7, 7, -9, 9]
 
 pub const queen_move_shifts = [-1, 1, -8, 8, -7, 7, -9, 9]
 
+fn make_getter(array: glearray.Array(Int)) -> fn(square.Square) -> Int {
+  fn(square: square.Square) {
+    let assert Ok(mask) = array |> glearray.get(square |> square.index)
+    mask
+  }
+}
+
 pub fn new() -> MoveTables {
   let white_pawn_table = glearray.from_list(white_pawn_moves)
   let black_pawn_table = glearray.from_list(black_pawn_moves)
@@ -131,20 +138,20 @@ pub fn new() -> MoveTables {
   let knight_table = glearray.from_list(knight_moves)
   let king_table = glearray.from_list(king_moves)
 
-  let white_pawn_getter = fn() { white_pawn_table }
-  let black_pawn_getter = fn() { black_pawn_table }
-  let white_pawn_capture_getter = fn() { white_pawn_capture_table }
-  let black_pawn_capture_getter = fn() { black_pawn_capture_table }
-  let knight_getter = fn() { knight_table }
-  let king_getter = fn() { king_table }
+  let white_pawn_getter = make_getter(white_pawn_table)
+  let black_pawn_getter = make_getter(black_pawn_table)
+  let white_pawn_capture_getter = make_getter(white_pawn_capture_table)
+  let black_pawn_capture_getter = make_getter(black_pawn_capture_table)
+  let knight_getter = make_getter(knight_table)
+  let king_getter = make_getter(king_table)
 
   MoveTables(
-    white_pawn_table: white_pawn_getter,
-    black_pawn_table: black_pawn_getter,
-    white_pawn_capture_table: white_pawn_capture_getter,
-    black_pawn_capture_table: black_pawn_capture_getter,
-    knight_table: knight_getter,
-    king_table: king_getter,
+    white_pawn_targets: white_pawn_getter,
+    black_pawn_targets: black_pawn_getter,
+    white_pawn_capture_targets: white_pawn_capture_getter,
+    black_pawn_capture_targets: black_pawn_capture_getter,
+    knight_targets: knight_getter,
+    king_targets: king_getter,
   )
 }
 
@@ -207,6 +214,6 @@ pub fn en_passant_source_masks(
   }
 
   // Prevent wrapping by AND'ing with the square's king mask
-  let assert Ok(neighbours) = move_tables.king_table() |> glearray.get(i)
+  let neighbours = move_tables.king_targets(target)
   mask |> int.bitwise_and(neighbours)
 }

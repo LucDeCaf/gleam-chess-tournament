@@ -7,7 +7,6 @@ import erlang_template/chess/fen
 import erlang_template/chess/move_gen
 import erlang_template/chess/move_gen/move_tables
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 import gleeunit/should
