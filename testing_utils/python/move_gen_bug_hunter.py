@@ -99,6 +99,14 @@ def main():
 
     if len(discrepancies) > 0:
         print("--- Discrepancies found ---")
+
+        # TODO: For each discrepancy, play the move, get the diffs, keep a running
+        # TODO: total of extra / missing moves, and continue until the total equals
+        # TODO: the discrepancy amount.
+
+        for discrepancy in discrepancies.keys():
+            pass
+
         print("Discrepancies: " + json.dumps(discrepancies))
         return
 
