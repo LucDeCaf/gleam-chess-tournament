@@ -8,6 +8,7 @@ import erlang_template/chess/board/square
 import erlang_template/chess/move_gen/move_tables
 import gleam/bool
 import gleam/int
+import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 
@@ -468,21 +469,21 @@ pub fn castling_moves(board: board.Board, tables: move_tables.MoveTables) {
 }
 
 fn can_castle_kingside(board: board.Board, tables) -> Bool {
-  can_castle(
+  io.debug(can_castle(
     board,
     #(0b0001, 0b0100),
     #([square.F1, square.G1], [square.F8, square.G8]),
     tables,
-  )
+  ))
 }
 
 fn can_castle_queenside(board: board.Board, tables) -> Bool {
-  can_castle(
+  io.debug(can_castle(
     board,
     #(0b0010, 0b1000),
     #([square.D1, square.C1, square.B1], [square.D8, square.C8, square.B8]),
     tables,
-  )
+  ))
 }
 
 /// Generic function for checking for castling validity in either direction (kingside or queenside)
@@ -508,7 +509,7 @@ fn can_castle(
     color.Black -> blockers.1
   }
 
-  use <- bool.guard(when: squares_empty(board, blockers), return: False)
+  use <- bool.guard(when: !squares_empty(board, blockers), return: False)
 
   // Can't castle into / out of / through check
   let enemy_color = board.color |> color.inverse
@@ -519,10 +520,10 @@ fn can_castle(
   let castle_squares = [king_square, ..blockers]
 
   use castle_square <- list.all(castle_squares)
-  board |> square_attacked_by(castle_square, enemy_color, tables)
+  !{ board |> square_attacked_by(castle_square, enemy_color, tables) }
 }
 
-fn squares_empty(board, squares) {
+pub fn squares_empty(board, squares) {
   let mask =
     squares
     |> list.map(square.bitboard)

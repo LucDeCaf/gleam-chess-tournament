@@ -400,3 +400,30 @@ pub fn square_attacked_by_test() {
   move_gen.square_attacked_by(board, test_case.0, test_case.1, tables)
   |> should.equal(test_case.2)
 }
+
+pub fn castle_moves_test() {
+  // Kiwipete
+  let board =
+    board.from_fen(
+      "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -",
+    )
+  let tables = move_tables.new()
+  let castles = board |> move_gen.castling_moves(tables)
+
+  castles
+  |> list.contains(move.new(square.E1, square.G1, flags.castle_kingside))
+  |> should.be_true
+  castles
+  |> list.contains(move.new(square.E1, square.C1, flags.castle_queenside))
+  |> should.be_true
+}
+
+pub fn squares_empty_test() {
+  let board = board.from_fen(fen.starting_fen)
+  move_gen.squares_empty(board, [square.E3, square.C6, square.H5])
+  |> should.be_true
+  move_gen.squares_empty(board, [square.E3, square.C6, square.H5, square.A1])
+  |> should.be_false
+  move_gen.squares_empty(board, [square.A1, square.B1, square.C1, square.D1])
+  |> should.be_false
+}
