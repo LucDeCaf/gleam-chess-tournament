@@ -72,6 +72,13 @@ pub fn from_fen(fen: String) -> Board {
   )
 }
 
+pub fn king_square(board, color) {
+  board
+  |> bitboard(piece.King, color)
+  |> bitboard.lsb_index
+  |> square.from_index_unchecked
+}
+
 pub fn make_move(on board: Board, play move: move.Move) -> Board {
   let source = move |> move.source
   let target = move |> move.target

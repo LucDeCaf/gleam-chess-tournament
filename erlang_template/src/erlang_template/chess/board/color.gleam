@@ -16,3 +16,10 @@ pub fn index(color) {
     Black -> 1
   }
 }
+
+pub fn sign(color) {
+  case color {
+    White -> 1
+    Black -> -1
+  }
+}

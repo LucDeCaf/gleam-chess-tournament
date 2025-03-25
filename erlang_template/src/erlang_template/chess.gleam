@@ -1,11 +1,11 @@
 import erlang_template/chess/board
 import erlang_template/chess/board/color
 import erlang_template/chess/board/move
-import erlang_template/chess/move_gen
+import erlang_template/chess/search
 import erlang_template/context
 import gleam/dynamic/decode
-import gleam/list
-import gleam/result
+import gleam/int
+import gleam/io
 
 pub fn player_decoder() {
   use player_string <- decode.then(decode.string)
@@ -24,11 +24,9 @@ pub fn move(
 ) -> Result(String, String) {
   let board = board.from_fen(fen)
 
-  let moves = move_gen.legal_moves(board, ctx.move_tables)
+  let max_depth = 4
+  let chosen_move = search.best_move(board, max_depth, ctx.move_tables)
 
-  // TODO: Move evaluation
-
-  let chosen_move = moves |> list.first |> result.unwrap(0)
-
-  Ok(move.to_string(chosen_move))
+  io.debug("chosen move eval: " <> int.to_string(chosen_move.1))
+  Ok(move.to_string(chosen_move.0))
 }

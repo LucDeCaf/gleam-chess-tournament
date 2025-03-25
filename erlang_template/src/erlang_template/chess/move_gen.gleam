@@ -545,11 +545,7 @@ pub fn is_legal_move(
   tables: move_tables.MoveTables,
 ) -> Bool {
   let board_after_move = board |> board.make_move(move)
-  let king_square =
-    board_after_move
-    |> board.bitboard(piece.King, board.color)
-    |> bitboard.lsb_index
-    |> square.from_index_unchecked
+  let king_square = board.king_square(board_after_move, board.color)
 
   let king_can_be_captured =
     board_after_move
