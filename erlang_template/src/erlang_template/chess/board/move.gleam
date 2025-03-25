@@ -65,7 +65,18 @@ pub fn is_capture(move: Move) -> Bool {
 pub fn to_string(move: Move) -> String {
   let source = source(move)
   let target = target(move)
-  square.to_string(source) <> square.to_string(target)
+  let promotion = case promotion(move) {
+    Some(piece) ->
+      case piece {
+        piece.Knight -> "n"
+        piece.Bishop -> "b"
+        piece.Rook -> "r"
+        piece.Queen -> "q"
+        _ -> ""
+      }
+    None -> ""
+  }
+  square.to_string(source) <> square.to_string(target) <> promotion
 }
 
 pub fn to_debug_string(move: Move) -> String {
