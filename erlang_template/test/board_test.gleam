@@ -27,6 +27,7 @@ pub fn castle_test() {
   post_white_kingside
   |> board.piece_bitboard(piece.King)
   |> should.equal(0x1000000000000040)
+  post_white_kingside.castling_rights |> should.equal(0b1100)
 
   let post_white_queenside =
     board
@@ -41,6 +42,7 @@ pub fn castle_test() {
   post_white_queenside
   |> board.piece_bitboard(piece.King)
   |> should.equal(0x1000000000000004)
+  post_white_queenside.castling_rights |> should.equal(0b1100)
 }
 
 pub fn en_passant_white_test() {
@@ -80,4 +82,43 @@ pub fn double_move_ep_square_test() {
     board |> board.make_move(move.new(square.C7, square.C5, flags.double_move))
   board.en_passant
   |> should.equal(Some(square.C6))
+}
+
+pub fn capture_test() {
+  let board =
+    board.from_fen(
+      "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -",
+    )
+    |> board.make_move(move.new(square.E5, square.F7, flags.capture))
+
+  board |> board.piece_bitboard(piece.Knight) |> should.equal(0x20220000040000)
+  board |> board.piece_bitboard(piece.Pawn) |> should.equal(0xd50081280e700)
+  board |> board.color_bitboard(color.White) |> should.equal(0x2000081024ff91)
+  board |> board.color_bitboard(color.Black) |> should.equal(0x915d730002800000)
+}
+
+pub fn king_move_test() {
+  let board =
+    board.from_fen(
+      "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -",
+    )
+    |> board.make_move(move.new(square.E1, square.D1, 0))
+
+  board |> board.piece_bitboard(piece.King) |> should.equal(0x1000000000000008)
+  board |> board.color_bitboard(color.White) |> should.equal(0x181024ff89)
+  board |> board.color_bitboard(color.Black) |> should.equal(0x917d730002800000)
+  board.castling_rights |> should.equal(0b1100)
+}
+
+pub fn rook_move_test() {
+  let board =
+    board.from_fen(
+      "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -",
+    )
+    |> board.make_move(move.new(square.H1, square.F1, 0))
+
+  board |> board.piece_bitboard(piece.Rook) |> should.equal(0x8100000000000021)
+  board |> board.color_bitboard(color.White) |> should.equal(0x181024ff31)
+  board |> board.color_bitboard(color.Black) |> should.equal(0x917d730002800000)
+  board.castling_rights |> should.equal(0b1110)
 }

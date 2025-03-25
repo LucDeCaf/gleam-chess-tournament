@@ -8,7 +8,6 @@ import erlang_template/chess/board/square
 import erlang_template/chess/move_gen/move_tables
 import gleam/bool
 import gleam/int
-import gleam/io
 import gleam/list
 import gleam/option.{None, Some}
 
