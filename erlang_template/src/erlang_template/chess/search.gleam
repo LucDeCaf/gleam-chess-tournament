@@ -42,7 +42,6 @@ fn search_inner(
     }
   })
 
-  // Might be alpha-beta pruning, I FUCKING hope I don't have to touch this again lmao
   let best_result =
     list.fold_until(moves, #(-2_147_483_648, alpha), fn(best_result, move) {
       let alpha = best_result.1
