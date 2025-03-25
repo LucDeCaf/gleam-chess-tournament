@@ -1,3 +1,4 @@
+import erlang_template/chess/board/piece
 import erlang_template/chess/board
 import erlang_template/chess/board/color
 import erlang_template/chess/board/move
@@ -27,6 +28,5 @@ pub fn move(
   let max_depth = 4
   let chosen_move = search.best_move(board, max_depth, ctx.move_tables)
 
-  io.debug("chosen move eval: " <> int.to_string(chosen_move.1))
   Ok(move.to_string(chosen_move.0))
 }

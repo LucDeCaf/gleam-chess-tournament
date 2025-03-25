@@ -59,10 +59,7 @@ fn search_inner(
       }
 
       case score >= beta {
-        True -> {
-          io.debug("failsoft")
-          list.Stop(best_result)
-        }
+        True -> list.Stop(best_result)
         False -> list.Continue(best_result)
       }
     })

@@ -106,9 +106,8 @@ pub fn square_attacked_by(
   let horizontals =
     move_tables.sliding_targets(square, blockers, move_tables.rook_move_shifts)
     |> int.bitwise_and(enemy_horizontals)
-  use <- bool.guard(when: horizontals != 0, return: True)
 
-  False
+  horizontals != 0
 }
 
 pub fn legal_moves(board, move_tables) -> List(move.Move) {
