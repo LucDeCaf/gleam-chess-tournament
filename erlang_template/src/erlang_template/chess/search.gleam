@@ -6,7 +6,6 @@ import erlang_template/chess/move_gen
 import erlang_template/chess/move_gen/move_tables
 import gleam/bool
 import gleam/int
-import gleam/io
 import gleam/list
 
 // TODO: Tests

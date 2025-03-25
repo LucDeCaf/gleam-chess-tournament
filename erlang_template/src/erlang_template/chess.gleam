@@ -1,12 +1,9 @@
-import erlang_template/chess/board/piece
 import erlang_template/chess/board
 import erlang_template/chess/board/color
 import erlang_template/chess/board/move
 import erlang_template/chess/search
 import erlang_template/context
 import gleam/dynamic/decode
-import gleam/int
-import gleam/io
 
 pub fn player_decoder() {
   use player_string <- decode.then(decode.string)

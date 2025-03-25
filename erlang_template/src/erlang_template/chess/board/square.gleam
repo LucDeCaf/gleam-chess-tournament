@@ -291,7 +291,8 @@ pub fn from_index_unchecked(value: Int) -> Square {
     63 -> H8
     _ ->
       panic as {
-        "invalid value for square.from_index_unchecked call: " <> int.to_string(value)
+        "invalid value for square.from_index_unchecked call: "
+        <> int.to_string(value)
       }
   }
 }
