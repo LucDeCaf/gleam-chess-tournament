@@ -4,13 +4,6 @@ import requests
 
 DEFAULT_FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"
 
-start_fen = input('Enter fen (leave blank for starting position): ').strip()
-if start_fen == "":
-    start_fen = DEFAULT_FEN
-perft_depth = int(input("Enter perft depth: "))
-
-board = chess.Board(start_fen)
-
 
 def perft(board: chess.Board, depth: int):
     if depth == 0:
@@ -80,6 +73,14 @@ MAX_DEPTH = 8
 
 
 def main():
+    start_fen = input(
+        'Enter fen (leave blank for starting position): ').strip()
+    if start_fen == "":
+        start_fen = DEFAULT_FEN
+    perft_depth = int(input("Enter perft depth: "))
+
+    board = chess.Board(start_fen)
+
     results = move_diffs(board, perft_depth)
     no_errors = True
 
@@ -117,6 +118,10 @@ def main():
             if len(results["missing"]) > 0:
                 print("MISSING FOUND")
                 print(results["missing"])
+
+            subdiscrepancies = {k: v for k, v in results["shared"].items() if v != 0}
+
+            print("\tSubdiscs: " + json.dumps(subdiscrepancies))
 
             board.pop()
 
