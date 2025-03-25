@@ -70,8 +70,8 @@ pub fn square_attacked_by(
   let knights = tables.knight_targets(square) |> int.bitwise_and(enemy_knights)
   use <- bool.guard(when: knights != 0, return: True)
 
-  let enemy_kings = board |> board.bitboard(piece.Knight, color)
-  let kings = tables.knight_targets(square) |> int.bitwise_and(enemy_kings)
+  let enemy_kings = board |> board.bitboard(piece.King, color)
+  let kings = tables.king_targets(square) |> int.bitwise_and(enemy_kings)
   use <- bool.guard(when: kings != 0, return: True)
 
   // Pawns are next cheapest
