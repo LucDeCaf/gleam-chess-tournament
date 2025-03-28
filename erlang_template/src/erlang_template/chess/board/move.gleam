@@ -62,6 +62,36 @@ pub fn is_capture(move: Move) -> Bool {
   int.bitwise_and(move, flags.capture) != 0
 }
 
+pub fn is_promotion(move: Move) -> Bool {
+  int.bitwise_and(move, flags.promotion) != 0
+}
+
+// Unchecked for performance reasons
+fn is_kingside_unchecked_promotion(move) {
+  int.bitwise_and(move, 0b11) != flags.castle_kingside
+}
+
+fn is_queenside_unchecked_promotion(move) {
+  int.bitwise_and(move, 0b11) != flags.castle_queenside
+}
+
+fn is_castle_unchecked_promotion(move) {
+  is_kingside_unchecked_promotion(move)
+  || is_queenside_unchecked_promotion(move)
+}
+
+pub fn is_kingside(move: Move) -> Bool {
+  !is_promotion(move) && is_kingside_unchecked_promotion(move)
+}
+
+pub fn is_queenside(move: Move) -> Bool {
+  !is_promotion(move) && is_queenside_unchecked_promotion(move)
+}
+
+pub fn is_castle(move: Move) -> Bool {
+  !is_promotion(move) && is_castle_unchecked_promotion(move)
+}
+
 pub fn to_string(move: Move) -> String {
   let source = source(move)
   let target = target(move)

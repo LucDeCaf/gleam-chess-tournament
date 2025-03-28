@@ -2,15 +2,15 @@ import erlang_template/chess/board/piece
 import gleam/int
 import gleam/option.{type Option, None, Some}
 
-pub const capture = 0b0100
+pub const capture = 0b1000
 
-pub const promotion = 0b1000
+pub const promotion = 0b0100
 
 pub const board_state_mask = 0b11
 
 pub const flags_mask = 0b1111
 
-pub const en_passant = 0b01
+pub const en_passant = 0b1001
 
 pub const double_move = 0b01
 

@@ -3,17 +3,17 @@ import erlang_template/chess/board/bitboard
 import erlang_template/chess/board/color
 import erlang_template/chess/board/piece
 
-const pawn_value = 100
+pub const pawn_value = 100
 
-const knight_value = 300
+pub const knight_value = 300
 
-const bishop_value = 320
+pub const bishop_value = 320
 
-const rook_value = 500
+pub const rook_value = 500
 
-const queen_value = 900
+pub const queen_value = 900
 
-fn count_material(board: board.Board) {
+pub fn material_balance(board: board.Board) {
   // TODO: Technically a bit suboptimal as board.color_bitboard is called multiple times
   let white_pawns =
     { board.bitboard(board, piece.Pawn, color.White) |> bitboard.popcount }
@@ -56,5 +56,5 @@ fn count_material(board: board.Board) {
 }
 
 pub fn evaluate(board: board.Board) -> Int {
-  count_material(board)
+  material_balance(board)
 }
