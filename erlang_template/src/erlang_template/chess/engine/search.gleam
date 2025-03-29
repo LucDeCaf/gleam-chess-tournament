@@ -100,5 +100,7 @@ pub fn quiesce(board, alpha, beta, mt, pst) -> Int {
 
 pub fn heuristics(a, b) -> order.Order {
   // MSB(1) is capture, MSB(2) is promotion, MSB(3,4) are special moves roughly in order
-  int.compare(a, b)
+  let a_flags = move.flags(a)
+  let b_flags = move.flags(b)
+  int.compare(a_flags, b_flags)
 }
