@@ -1,5 +1,5 @@
 import erlang_template/chess/board
-import erlang_template/chess/eval
+import erlang_template/chess/engine/eval
 import erlang_template/chess/fen
 import gleeunit/should
 

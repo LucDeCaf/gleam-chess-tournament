@@ -1,6 +1,6 @@
 import erlang_template/chess
 import erlang_template/chess/board
-import erlang_template/chess/move_gen/move_tables
+import erlang_template/chess/tables/move_tables
 import erlang_template/context
 import gleam/dynamic/decode
 import gleam/erlang/process

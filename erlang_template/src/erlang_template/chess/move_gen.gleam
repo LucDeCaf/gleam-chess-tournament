@@ -5,7 +5,7 @@ import erlang_template/chess/board/flags
 import erlang_template/chess/board/move
 import erlang_template/chess/board/piece
 import erlang_template/chess/board/square
-import erlang_template/chess/move_gen/move_tables
+import erlang_template/chess/tables/move_tables
 import gleam/bool
 import gleam/int
 import gleam/list

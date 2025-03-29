@@ -1,6 +1,6 @@
 import erlang_template/chess/board/color
 import erlang_template/chess/board/square
-import erlang_template/chess/move_gen/move_tables
+import erlang_template/chess/tables/move_tables
 import gleeunit/should
 
 pub fn en_passant_source_mask_test() {

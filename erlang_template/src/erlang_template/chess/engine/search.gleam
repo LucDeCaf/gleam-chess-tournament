@@ -1,7 +1,7 @@
 import erlang_template/chess/board
 import erlang_template/chess/board/color
 import erlang_template/chess/board/move
-import erlang_template/chess/eval
+import erlang_template/chess/engine/eval
 import erlang_template/chess/move_gen
 import gleam/bool
 import gleam/int

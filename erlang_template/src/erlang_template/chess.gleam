@@ -1,7 +1,7 @@
 import erlang_template/chess/board
 import erlang_template/chess/board/color
 import erlang_template/chess/board/move
-import erlang_template/chess/search
+import erlang_template/chess/engine/search
 import erlang_template/context
 import gleam/dynamic/decode
 
