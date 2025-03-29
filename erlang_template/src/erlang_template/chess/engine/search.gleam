@@ -9,17 +9,16 @@ import gleam/io
 import gleam/list
 import gleam/order
 
-pub fn best_move(board, depth, tables) {
+pub fn best_move(board, depth, mt, pst) {
   use <- bool.guard(depth == 0, 0)
-  // Null move
 
-  let moves = board |> move_gen.legal_moves(tables)
+  let moves = board |> move_gen.legal_moves(mt)
 
   let evals =
     moves
     |> list.map(fn(move) {
       let board = board |> board.make_move(move)
-      #(move, search(board, depth - 1, tables))
+      #(move, search(board, depth - 1, mt, pst))
     })
     |> list.sort(fn(a, b) { int.compare(a.1, b.1) })
 
@@ -29,17 +28,17 @@ pub fn best_move(board, depth, tables) {
   }
 }
 
-pub fn search(board, depth, tables) {
-  search_inner(board, depth, -999_999_999, 999_999_999, tables)
+pub fn search(board, depth, mt, pst) {
+  search_inner(board, depth, -999_999_999, 999_999_999, mt, pst)
 }
 
-pub fn search_inner(board, depth, alpha, beta, tables) -> Int {
+pub fn search_inner(board, depth, alpha, beta, mt, pst) -> Int {
   // use <- bool.lazy_guard(depth == 0, fn() {
   //   quiesce(board, alpha, beta, tables)
   // })
-  use <- bool.lazy_guard(depth == 0, fn() { eval.evaluate(board) })
+  use <- bool.lazy_guard(depth == 0, fn() { eval.evaluate(board, pst) })
 
-  let moves = board |> move_gen.legal_moves(tables) |> list.sort(heuristics)
+  let moves = board |> move_gen.legal_moves(mt) |> list.sort(heuristics)
 
   use <- bool.lazy_guard(list.is_empty(moves), fn() {
     io.debug("terminal position found")
@@ -48,7 +47,7 @@ pub fn search_inner(board, depth, alpha, beta, tables) -> Int {
         board,
         board.king_square(board, board.color),
         board.color |> color.inverse,
-        tables,
+        mt,
       )
     {
       // Checkmate
@@ -60,7 +59,7 @@ pub fn search_inner(board, depth, alpha, beta, tables) -> Int {
 
   list.fold_until(moves, alpha, fn(alpha, move) {
     let board = board.make_move(board, move)
-    let score = -search_inner(board, depth - 1, -beta, -alpha, tables)
+    let score = -search_inner(board, depth - 1, -beta, -alpha, mt, pst)
 
     let alpha = int.max(alpha, score)
 
@@ -71,8 +70,8 @@ pub fn search_inner(board, depth, alpha, beta, tables) -> Int {
   })
 }
 
-pub fn quiesce(board, alpha, beta, tables) -> Int {
-  let stand_pat = eval.evaluate(board)
+pub fn quiesce(board, alpha, beta, mt, pst) -> Int {
+  let stand_pat = eval.evaluate(board, pst)
 
   use <- bool.guard(stand_pat >= beta, stand_pat)
 
@@ -80,7 +79,7 @@ pub fn quiesce(board, alpha, beta, tables) -> Int {
 
   let captures =
     board
-    |> move_gen.legal_moves(tables)
+    |> move_gen.legal_moves(mt)
     |> list.filter(move.is_capture)
     |> list.sort(heuristics)
 
@@ -88,7 +87,7 @@ pub fn quiesce(board, alpha, beta, tables) -> Int {
 
   list.fold_until(captures, alpha, fn(alpha, move) {
     let board = board.make_move(board, move)
-    let score = -quiesce(board, -beta, -alpha, tables)
+    let score = -quiesce(board, -beta, -alpha, mt, pst)
 
     let alpha = int.max(alpha, score)
 

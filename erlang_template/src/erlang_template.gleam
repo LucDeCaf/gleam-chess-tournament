@@ -1,6 +1,7 @@
 import erlang_template/chess
 import erlang_template/chess/board
 import erlang_template/chess/tables/move_tables
+import erlang_template/chess/tables/piece_square_tables
 import erlang_template/context
 import gleam/dynamic/decode
 import gleam/erlang/process
@@ -15,7 +16,11 @@ pub fn main() {
   wisp.configure_logger()
   let secret_key_base = wisp.random_string(64)
 
-  let ctx = context.Context(move_tables.new())
+  let ctx =
+    context.Context(
+      move_tables: move_tables.new(),
+      piece_square_tables: piece_square_tables.new(),
+    )
 
   let handler = fn(req: Request) { handle_request(req, ctx) }
 

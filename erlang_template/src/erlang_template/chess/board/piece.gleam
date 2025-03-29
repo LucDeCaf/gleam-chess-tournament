@@ -30,4 +30,6 @@ pub fn from_index(i) {
   }
 }
 
+pub const all_pieces = [Pawn, Knight, Bishop, Rook, Queen, King]
+
 pub const valid_promotion_pieces = [Knight, Bishop, Rook, Queen]

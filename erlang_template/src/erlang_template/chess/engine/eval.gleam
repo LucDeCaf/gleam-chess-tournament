@@ -2,6 +2,11 @@ import erlang_template/chess/board
 import erlang_template/chess/board/bitboard
 import erlang_template/chess/board/color
 import erlang_template/chess/board/piece
+import erlang_template/chess/board/square
+import erlang_template/chess/tables
+import erlang_template/chess/tables/piece_square_tables
+import gleam/int
+import gleam/list
 
 pub const pawn_value = 100
 
@@ -13,48 +18,145 @@ pub const rook_value = 500
 
 pub const queen_value = 900
 
-pub fn material_balance(board: board.Board) {
-  // TODO: Technically a bit suboptimal as board.color_bitboard is called multiple times
-  let white_pawns =
-    { board.bitboard(board, piece.Pawn, color.White) |> bitboard.popcount }
-    * pawn_value
-  let white_knights =
-    { board.bitboard(board, piece.Knight, color.White) |> bitboard.popcount }
-    * knight_value
-  let white_bishops =
-    { board.bitboard(board, piece.Bishop, color.White) |> bitboard.popcount }
-    * bishop_value
-  let white_rooks =
-    { board.bitboard(board, piece.Rook, color.White) |> bitboard.popcount }
-    * rook_value
-  let white_queens =
-    { board.bitboard(board, piece.Queen, color.White) |> bitboard.popcount }
-    * queen_value
+pub const king_value = 0
 
-  let black_pawns =
-    { board.bitboard(board, piece.Pawn, color.Black) |> bitboard.popcount }
-    * pawn_value
-  let black_knights =
-    { board.bitboard(board, piece.Knight, color.Black) |> bitboard.popcount }
-    * knight_value
-  let black_bishops =
-    { board.bitboard(board, piece.Bishop, color.Black) |> bitboard.popcount }
-    * bishop_value
-  let black_rooks =
-    { board.bitboard(board, piece.Rook, color.Black) |> bitboard.popcount }
-    * rook_value
-  let black_queens =
-    { board.bitboard(board, piece.Queen, color.Black) |> bitboard.popcount }
-    * queen_value
+pub fn material_with_pst(
+  board: board.Board,
+  pst: piece_square_tables.PieceSquareTables,
+) {
+  // ? Technically a bit suboptimal as board.color_bitboard is called multiple times internally
+  let friendly_color = board.color
+  let enemy_color = board.color |> color.inverse
 
-  let white_material =
-    white_pawns + white_knights + white_bishops + white_rooks + white_queens
-  let black_material =
-    black_pawns + black_knights + black_bishops + black_rooks + black_queens
+  let friendly_pawns =
+    apply_pst(
+      board.bitboard(board, piece.Pawn, friendly_color),
+      friendly_color,
+      pawn_value,
+      pst.pawn_middlegame,
+    )
+  let friendly_knights =
+    apply_pst(
+      board.bitboard(board, piece.Knight, friendly_color),
+      friendly_color,
+      knight_value,
+      pst.knight_middlegame,
+    )
+  let friendly_bishops =
+    apply_pst(
+      board.bitboard(board, piece.Bishop, friendly_color),
+      friendly_color,
+      bishop_value,
+      pst.bishop_middlegame,
+    )
+  let friendly_rooks =
+    apply_pst(
+      board.bitboard(board, piece.Rook, friendly_color),
+      friendly_color,
+      rook_value,
+      pst.rook_middlegame,
+    )
+  let friendly_queens =
+    apply_pst(
+      board.bitboard(board, piece.Queen, friendly_color),
+      friendly_color,
+      queen_value,
+      pst.queen_middlegame,
+    )
+  let friendly_kings =
+    apply_pst(
+      board.bitboard(board, piece.King, friendly_color),
+      friendly_color,
+      king_value,
+      pst.king_middlegame,
+    )
 
-  { white_material - black_material } * { board.color |> color.sign }
+  let enemy_pawns =
+    apply_pst(
+      board.bitboard(board, piece.Pawn, enemy_color),
+      enemy_color,
+      pawn_value,
+      pst.pawn_middlegame,
+    )
+  let enemy_knights =
+    apply_pst(
+      board.bitboard(board, piece.Knight, enemy_color),
+      enemy_color,
+      knight_value,
+      pst.knight_middlegame,
+    )
+  let enemy_bishops =
+    apply_pst(
+      board.bitboard(board, piece.Bishop, enemy_color),
+      enemy_color,
+      bishop_value,
+      pst.bishop_middlegame,
+    )
+  let enemy_rooks =
+    apply_pst(
+      board.bitboard(board, piece.Rook, enemy_color),
+      enemy_color,
+      rook_value,
+      pst.rook_middlegame,
+    )
+  let enemy_queens =
+    apply_pst(
+      board.bitboard(board, piece.Queen, enemy_color),
+      enemy_color,
+      queen_value,
+      pst.queen_middlegame,
+    )
+  let enemy_kings =
+    apply_pst(
+      board.bitboard(board, piece.King, enemy_color),
+      enemy_color,
+      king_value,
+      pst.king_middlegame,
+    )
+
+  let total_friendly_score =
+    friendly_pawns
+    + friendly_knights
+    + friendly_bishops
+    + friendly_rooks
+    + friendly_queens
+    + friendly_kings
+  let total_enemy_score =
+    enemy_pawns
+    + enemy_knights
+    + enemy_bishops
+    + enemy_rooks
+    + enemy_queens
+    + enemy_kings
+
+  total_friendly_score - total_enemy_score
 }
 
-pub fn evaluate(board: board.Board) -> Int {
-  material_balance(board)
+pub fn apply_pst(
+  pieces: Int,
+  color: color.Color,
+  base_score: Int,
+  pst_getter: tables.TableGetter,
+) {
+  pieces
+  |> bitboard.map_index(fn(i) {
+    // TODO: Flip the PSTs if board.color == black
+    let pst_square = case color {
+      // White - PST is already correct
+      color.White -> square.from_index_unchecked(i)
+
+      // Black - PST must be mirrored across x-axis
+      color.Black -> todo
+    }
+
+    base_score + pst_getter(pst_square)
+  })
+  |> list.fold(0, int.add)
+}
+
+pub fn evaluate(
+  board: board.Board,
+  pst: piece_square_tables.PieceSquareTables,
+) -> Int {
+  material_with_pst(board, pst)
 }

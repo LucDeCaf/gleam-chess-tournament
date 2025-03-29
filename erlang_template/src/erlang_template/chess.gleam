@@ -23,7 +23,7 @@ pub fn move(
   let board = board.from_fen(fen)
 
   let max_depth = 4
-  let chosen_move = search.best_move(board, max_depth, ctx.move_tables)
+  let chosen_move = search.best_move(board, max_depth, ctx.move_tables, ctx.piece_square_tables)
 
   Ok(move.to_string(chosen_move))
 }
