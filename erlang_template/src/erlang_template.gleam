@@ -1,5 +1,6 @@
 import erlang_template/chess
 import erlang_template/chess/board
+import erlang_template/chess/engine/eval
 import erlang_template/chess/tables/move_tables
 import erlang_template/chess/tables/piece_square_tables
 import erlang_template/context
@@ -40,6 +41,7 @@ fn handle_request(request: Request, ctx: context.Context) -> Response {
     ["move"] -> handle_move(request, ctx)
     ["perft"] -> handle_perft(request, ctx)
     ["divide"] -> handle_divide(request, ctx)
+    ["eval"] -> handle_eval(request, ctx)
     _ -> wisp.ok()
   }
 }
@@ -100,6 +102,32 @@ fn handle_divide(request: Request, ctx: context.Context) {
         |> json.to_string_tree
 
       wisp.json_response(json, 200)
+    }
+  }
+}
+
+fn eval_decoder() {
+  use fen <- decode.field("fen", decode.string)
+  decode.success(fen)
+}
+
+fn handle_eval(request: Request, ctx: context.Context) {
+  use body <- wisp.require_string_body(request)
+  let decode_result = json.parse(body, eval_decoder())
+  case decode_result {
+    Error(_) -> wisp.bad_request()
+    Ok(fen) -> {
+      let board = board.from_fen(fen)
+      let eval = eval.evaluate(board, ctx.piece_square_tables)
+      wisp.ok()
+      // Add plus sign before positive values
+      |> wisp.string_body(
+        case eval >= 0 {
+          True -> "+"
+          False -> ""
+        }
+        <> int.to_string(eval),
+      )
     }
   }
 }

@@ -110,6 +110,15 @@ pub fn square_attacked_by(
   horizontals != 0
 }
 
+pub fn is_check(board, mt) {
+  square_attacked_by(
+    board,
+    board.king_square(board, board.color),
+    board.color |> color.inverse,
+    mt,
+  )
+}
+
 pub fn legal_moves(board, move_tables) -> List(move.Move) {
   let all_moves = pseudolegal_moves(board, move_tables)
   use move <- list.filter(all_moves)

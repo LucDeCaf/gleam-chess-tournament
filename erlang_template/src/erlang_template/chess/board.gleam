@@ -318,6 +318,16 @@ fn handle_normal_move(
     None -> #(0, -1)
   }
 
+  // Don't remove captured piece if is of the same type as moved_piece
+  let moved_piece_mask = case captured_piece {
+    Some(piece) ->
+      case piece == moved_piece {
+        True -> source_bb
+        False -> moved_piece_mask
+      }
+    None -> moved_piece_mask
+  }
+
   let #(friendly_bb_index, enemy_bb_index) = case board.color {
     color.White -> #(6, 7)
     color.Black -> #(7, 6)
@@ -330,7 +340,8 @@ fn handle_normal_move(
       int.bitwise_exclusive_or(bitboard, case i {
         i if i == moved_bb_i -> moved_piece_mask
         i if i == captured_bb_i -> captured_piece_mask
-        i if i == friendly_bb_index -> moved_piece_mask
+        i if i == friendly_bb_index ->
+          moved_piece_mask |> int.bitwise_or(target_bb)
         i if i == enemy_bb_index -> captured_piece_mask
         _ -> 0
       })

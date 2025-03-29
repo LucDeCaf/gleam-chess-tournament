@@ -1,3 +1,4 @@
+import gleam/io
 import erlang_template/chess/board
 import erlang_template/chess/board/color
 import erlang_template/chess/board/flags
@@ -121,4 +122,15 @@ pub fn rook_move_test() {
   board |> board.color_bitboard(color.White) |> should.equal(0x181024ff31)
   board |> board.color_bitboard(color.Black) |> should.equal(0x917d730002800000)
   board.castling_rights |> should.equal(0b1110)
+}
+
+// oh GOD FUCKING DAMMIT OF COURSE LUC YOU IDIOT
+pub fn rook_capture_rook_test() {
+  let board =
+    board.from_fen("r3k3/8/8/8/8/8/7r/R3K2R b KQq -")
+    |> board.make_move(move.new(square.H2, square.H1, flags.capture))
+
+  board.piece_bitboard(board, piece.Rook) |> should.equal(0x100000000000081)
+  board.color_bitboard(board, color.White) |> should.equal(0x11)
+  board.color_bitboard(board, color.Black) |> should.equal(0x1100000000000080)
 }

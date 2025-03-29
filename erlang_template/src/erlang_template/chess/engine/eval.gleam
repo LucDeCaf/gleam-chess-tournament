@@ -5,6 +5,7 @@ import erlang_template/chess/board/piece
 import erlang_template/chess/board/square
 import erlang_template/chess/tables
 import erlang_template/chess/tables/piece_square_tables
+import gleam/bool
 import gleam/int
 import gleam/list
 
@@ -138,6 +139,8 @@ pub fn apply_pst(
   base_score: Int,
   pst_getter: tables.TableGetter,
 ) {
+  use <- bool.guard(pieces == 0, 0)
+
   pieces
   |> bitboard.map_index(fn(i) {
     // TODO: Flip the PSTs if board.color == black
