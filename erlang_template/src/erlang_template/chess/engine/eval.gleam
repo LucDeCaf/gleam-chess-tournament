@@ -146,7 +146,11 @@ pub fn apply_pst(
       color.White -> square.from_index_unchecked(i)
 
       // Black - PST must be mirrored across x-axis
-      color.Black -> todo
+      color.Black -> {
+        let rank = 7 - square.rank(i)
+        let file = square.file(i)
+        square.from_index_unchecked(rank * 8 + file)
+      }
     }
 
     base_score + pst_getter(pst_square)
