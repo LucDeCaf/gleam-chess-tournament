@@ -143,13 +143,13 @@ pub fn apply_pst(
 
   pieces
   |> bitboard.map_index(fn(i) {
-    // TODO: Flip the PSTs if board.color == black
+    // TODO: Flip the PSTs if board.color == white
     let pst_square = case color {
-      // White - PST is already correct
-      color.White -> square.from_index_unchecked(i)
+      // Black - PST is already correct
+      color.Black -> square.from_index_unchecked(i)
 
-      // Black - PST must be mirrored across x-axis
-      color.Black -> {
+      // White - PST must be mirrored across x-axis
+      color.White -> {
         let rank = 7 - square.rank(i)
         let file = square.file(i)
         square.from_index_unchecked(rank * 8 + file)

@@ -1,4 +1,3 @@
-import gleam/io
 import erlang_template/chess/board
 import erlang_template/chess/board/color
 import erlang_template/chess/board/flags
