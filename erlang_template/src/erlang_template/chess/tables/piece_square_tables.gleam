@@ -86,18 +86,18 @@ const king_endgame = [
 
 pub type PieceSquareTables {
   PieceSquareTables(
-    pawn_middlegame: tables.TableGetter,
-    pawn_endgame: tables.TableGetter,
-    knight_middlegame: tables.TableGetter,
-    knight_endgame: tables.TableGetter,
-    bishop_middlegame: tables.TableGetter,
-    bishop_endgame: tables.TableGetter,
-    rook_middlegame: tables.TableGetter,
-    rook_endgame: tables.TableGetter,
-    queen_middlegame: tables.TableGetter,
-    queen_endgame: tables.TableGetter,
-    king_middlegame: tables.TableGetter,
-    king_endgame: tables.TableGetter,
+    pawn_middlegame: tables.TableGetter(Int),
+    pawn_endgame: tables.TableGetter(Int),
+    knight_middlegame: tables.TableGetter(Int),
+    knight_endgame: tables.TableGetter(Int),
+    bishop_middlegame: tables.TableGetter(Int),
+    bishop_endgame: tables.TableGetter(Int),
+    rook_middlegame: tables.TableGetter(Int),
+    rook_endgame: tables.TableGetter(Int),
+    queen_middlegame: tables.TableGetter(Int),
+    queen_endgame: tables.TableGetter(Int),
+    king_middlegame: tables.TableGetter(Int),
+    king_endgame: tables.TableGetter(Int),
   )
 }
 

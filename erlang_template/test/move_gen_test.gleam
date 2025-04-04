@@ -107,14 +107,29 @@ pub fn sliding_targets_test() {
   let expected_bishop_moves = 0x8850005088040000
   let expected_rook_moves = 0x20df2000000000
 
-  move_tables.sliding_targets(square, blockers, move_tables.rook_move_shifts)
+  move_tables.sliding_targets(
+    square,
+    blockers,
+    move_tables.rook_move_shifts,
+    False,
+  )
   |> should.equal(expected_rook_moves)
-  move_tables.sliding_targets(square, blockers, move_tables.bishop_move_shifts)
+  move_tables.sliding_targets(
+    square,
+    blockers,
+    move_tables.bishop_move_shifts,
+    False,
+  )
   |> should.equal(expected_bishop_moves)
 
   let square = square.A1
   let expected_rook_moves = 0x101010101fe
-  move_tables.sliding_targets(square, blockers, move_tables.rook_move_shifts)
+  move_tables.sliding_targets(
+    square,
+    blockers,
+    move_tables.rook_move_shifts,
+    False,
+  )
   |> should.equal(expected_rook_moves)
 }
 

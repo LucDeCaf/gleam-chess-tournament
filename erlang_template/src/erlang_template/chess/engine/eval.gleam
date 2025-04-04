@@ -137,7 +137,7 @@ pub fn apply_pst(
   pieces: Int,
   color: color.Color,
   base_score: Int,
-  pst_getter: tables.TableGetter,
+  pst_getter: tables.TableGetter(Int),
 ) {
   use <- bool.guard(pieces == 0, 0)
 

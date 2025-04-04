@@ -1,0 +1,493 @@
+commit de2ce86568b4243d53d9ee5fd1642ef48992f49c
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Fri Apr 4 10:46:44 2025 +0200
+
+    add DS_Store to gitignore
+
+commit 30274fcde550d075ffe33f0c30b499897e36d10f
+Merge: c023b21 5d8763d
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 30 13:49:17 2025 +0200
+
+    Merge branch 'main' of github.com:LucDeCaf/gleam-chess-tournament
+
+commit c023b21b35a951fa5b42c4b276b0ad4fe20e5993
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 30 13:48:42 2025 +0200
+
+    improve search speed, refactor some funcs
+
+commit 5d8763dc5b0de7216979fdc9972cb8db2c2bec94
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 30 13:48:42 2025 +0200
+
+    improve move gen speed, refactor some funcs
+
+commit bfea1b93a5928e67e92a801cf2a2744aed6bb86d
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sat Mar 29 18:38:44 2025 +0200
+
+    after infinite debugging, I discovered that capturing a piece with another piece of the same kind deletes both pieces. :)
+
+commit 46680a4bca211e6c6f971279d696d60c68cd08cc
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sat Mar 29 15:49:03 2025 +0200
+
+    fix heuristics not sorting properly
+
+commit af77f24c76762e05328eaa72470f0afc95a191bd
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sat Mar 29 15:13:38 2025 +0200
+
+    mirror pst rank when color is black
+
+commit 21f5d4e26d42204a0b62352cbed26a2eb92bdbe3
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sat Mar 29 09:57:47 2025 +0200
+
+    (incomplete) add PST table usage to eval func
+
+commit 73a37f531a60b7615889377288fa722277edc11d
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sat Mar 29 09:16:03 2025 +0200
+
+    formatting
+
+commit a062305c1525a242de5b7390264b500f01a2ad5d
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sat Mar 29 09:14:41 2025 +0200
+
+    add queen mg and king eg tables
+
+commit ebe4de3f285b5dc20767b373c85fab754063ef5b
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sat Mar 29 09:06:14 2025 +0200
+
+    update imports + add more piece square tables
+
+commit dd340f4f6c2661c3f2a50f342eaaf240a0c49623
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Fri Mar 28 22:51:27 2025 +0200
+
+    (incomplete) create tables module and move tables code to it
+
+commit ee054ea72265ff19c7c1e20b0991d36249e41508
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Fri Mar 28 22:24:04 2025 +0200
+
+    (incomplete) move project files around, add best_move func
+
+commit 5ff822505db22f711de31cab41620ad6b1aa457c
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 25 21:07:17 2025 +0200
+
+    remove unnecessary imports
+
+commit ba1ffba1330c190889831b6d348f003e25e489a2
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 25 21:06:51 2025 +0200
+
+    minor cleanup and remove unnecessary debugs
+
+commit a84ed5766a0b4fa0799721efa568cf0022933f34
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 25 21:04:38 2025 +0200
+
+    fix kings being treated as knights in legality check - whoops
+
+commit e565da620833ba53a667da0b5a33ee544adaa5ca
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 25 20:54:31 2025 +0200
+
+    add promotion suffixes to move.to_string
+
+commit 8b1d0c8201b53f21d5df410435a1d27366b4e321
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 25 20:46:03 2025 +0200
+
+    remove profanity lol
+
+commit 39484fc951391ab0558f90067cafde985f341650
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 25 20:45:28 2025 +0200
+
+    tests, utility funcs, basic search and eval
+
+commit 2ad75900d3c3db26c8a65faf594e4b50521acd74
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 25 12:19:35 2025 +0200
+
+    update python tests - i seriously think perft is bugged
+
+commit a425e0f9bd2ac0b91bda071b9237352e4dc79528
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 25 12:19:14 2025 +0200
+
+    remove unneeded imports + add make_move tests
+
+commit 6ebc6ebf4df79021424841207bae8aeefaadee41
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 23 20:52:29 2025 +0200
+
+    add more tests - beginning to wonder if there's a bug in perft
+
+commit b4b37934017c14c628dc9feac9a5f9f70287a3f6
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 23 20:45:03 2025 +0200
+
+    fix ep square not being calculated correctly for black pawns
+
+commit 4ddfc742853932f6a6a6a181236dade7bfa6fad7
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 23 20:20:12 2025 +0200
+
+    improve test utils output
+
+commit 2b22c304e7e25a06691d75879e2d53bbfaf2ce6d
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 23 20:09:31 2025 +0200
+
+    fix castling rights not being removed correctly
+
+commit 871728c2188f8f81d3464b395a15a3222f981e57
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 23 15:55:28 2025 +0200
+
+    add castling tests
+
+commit ca7e530fbd8de71ff44ffc51137cb1256a25a674
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 23 15:47:32 2025 +0200
+
+    fix castling not being generated as a move
+
+commit 772492f3f37bc4e78a4030efcf332ffc9b6100b2
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 23 15:47:17 2025 +0200
+
+    update formatting
+
+commit 986cd324053a3ad13905aac04bf836ef064fb311
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 23 15:29:10 2025 +0200
+
+    optimise square_attacked_by using bool.guard
+
+commit 765365f20837ffffe7c5d75ffd13193a2717cfcf
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 23 11:44:43 2025 +0200
+
+    remove debug calls in move_gen_test
+
+commit d1ec4869f44ad328d8e606bfa0157e228d688225
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 23 11:43:49 2025 +0200
+
+    add todo to py bug hunter
+
+commit 35e214bb66a8a6e40ecd654729cacea126c8e988
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sun Mar 23 11:42:24 2025 +0200
+
+    memoize move_tables
+
+commit e8fbce76ec8eb0be430e4e8c5f4a71e61994dbf0
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sat Mar 22 14:52:17 2025 +0200
+
+    improve TUI for python bug hunter
+
+commit 2f0feee2aa06da0041227d7ae4242bd83bc677f3
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sat Mar 22 14:41:39 2025 +0200
+
+    finish python test script + add perft
+
+commit e6546549541c4589848b2032c399f2ee412ae2fb
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Fri Mar 21 22:35:49 2025 +0200
+
+    add divide func + add /divide route + update py test func
+
+commit ff29875564d51a5290ef9511a144976859f06d58
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Fri Mar 21 22:09:33 2025 +0200
+
+    add new python testing script
+
+commit c29520c69b0b292724c36cf3dc61f2b78b588626
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Fri Mar 21 16:24:19 2025 +0200
+
+    add castling move gen (untested)
+
+commit 41b1c560449786d3c2fd9ce9a5b1d78c9a5f3c86
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Fri Mar 21 13:37:55 2025 +0200
+
+    fix error in checking for legal moves + clean up code
+
+commit fb706ec0e5f04a563515c67d9d1b8bca9513e5d2
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Fri Mar 21 11:03:01 2025 +0200
+
+    remove invalid fens (the hell are there invalid fens for?)
+
+commit 26586c15b03f9c9991b002d2c690fa41c82ae088
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Fri Mar 21 10:17:46 2025 +0200
+
+    add requirements.txt
+
+commit 0873072bb8aefdc00e41b393c46b4b41d069d268
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Thu Mar 20 14:56:23 2025 +0200
+
+    add python chess legal move gen + legal move test
+
+commit ffa30a3426aa1d543ada48f948a2b4e82b09920b
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Thu Mar 20 14:32:34 2025 +0200
+
+    add another en passant test
+
+commit 4207b61b233ffd1d9d9ea11b0db965c87b7a22ef
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Thu Mar 20 14:30:48 2025 +0200
+
+    add en passant test
+
+commit a4b49cb2d7cbfb952b95e79d3e104411063e4a4d
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Thu Mar 20 14:24:30 2025 +0200
+
+    add fen test (forgot to commit)
+
+commit 71c5d613b64a9c00da88d0572d677ee5361bbe74
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Thu Mar 20 14:24:11 2025 +0200
+
+    add capture tests
+
+commit eeaabdcfe1a533fe364120a7cc3c62bd306da67d
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Thu Mar 20 14:13:34 2025 +0200
+
+    add fen test
+
+commit aa7dc8859bacb19445f0a3f32dc7c42b38ddc234
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Thu Mar 20 14:03:25 2025 +0200
+
+    remove magic bitboard leftover file
+
+commit 4092391b119a729a8edcfd1eb4e494b8b9bbaff3
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Thu Mar 20 14:03:04 2025 +0200
+
+    add todos
+
+commit 948bc350e152688713ad0b21c31537836c4e410f
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Thu Mar 20 14:02:05 2025 +0200
+
+    add rook move gen tests
+
+commit bfc30ba74322ac6b04d733662ca89353ad16523b
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Thu Mar 20 13:22:56 2025 +0200
+
+    bishop move generator test
+
+commit d416ceb35159762de4c8dc3f10db97fcae15af98
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Wed Mar 19 11:24:10 2025 +0200
+
+    basic legal move checker (seemingly not functional)
+
+commit da47e2461a4d69f9f47fe7ed8ef2723ac06c5fff
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Wed Mar 19 11:13:02 2025 +0200
+
+    square attacked by and attacks to functions
+
+commit 5cb7687d20e7870c2aaa60d738f7594bd727b890
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Wed Mar 19 10:40:20 2025 +0200
+
+    remove test prefixes
+
+commit 189837c6a34d560c7751ba56d844bbab0d14483b
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Wed Mar 19 10:38:55 2025 +0200
+
+    re-add erlang_template_test/main
+
+commit c58707949f29364378da6166a65910e76086b21f
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Wed Mar 19 10:37:13 2025 +0200
+
+    formatting + split tests into multiple files
+
+commit 5b1c2dd2725b44851f8f83397afdf92b8b74895a
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Wed Mar 19 10:26:47 2025 +0200
+
+    refactor handle_promotion and handle castling rights changes
+
+commit 23a57021a2d9baeaae3269848427cf4c12b47bcc
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Wed Mar 19 08:57:58 2025 +0200
+
+    add /perft endpoint
+
+commit c2313d4a1d5679a9891a7f5e3fdfe4a647d5abfa
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Wed Mar 19 07:41:34 2025 +0200
+
+    remove magic bitboards - consumes too much mem and array accesses aren't even that fast in Gleam
+
+commit d20acb7b9c1a9918a87808879080af5110c981d5
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 21:20:16 2025 +0200
+
+    add king moves + remove random debugs
+
+commit f28bb7d5ccccbaddce9ad3c675aa325940acc59e
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 21:12:09 2025 +0200
+
+    fix overcounting in perft
+
+commit 236f6c377f76092269639733390aae3188680ccf
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 21:09:39 2025 +0200
+
+    add perft func to main call (will refactor) + fix sliding pieces not blocking out friendly pieces
+
+commit d398099c44bbcefadc999727f354faf41b2de5f3
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 20:50:09 2025 +0200
+
+    refactor the horrific piece_at implementation
+
+commit dbf962c34e585859c9983b2bebf967e4b6d5398f
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 20:38:16 2025 +0200
+
+    add normal move handling
+
+commit e233a2da5ca3129e79798c223b1527030ff1e565
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 20:14:29 2025 +0200
+
+    add castling and en passant move handling
+
+commit 2f5d9a3327469a536e5a0cc4bd20394cfb05cb3b
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 14:12:01 2025 +0200
+
+    add promotion move handling + infra for move function + formatting / minor restructuring
+
+commit f4830ec9c8f8e35d76b7de7eba9d412ce924db79
+Merge: c0d5b2d 332bb8c
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 12:16:20 2025 +0200
+
+    Merge branch 'main' of github.com:LucDeCaf/gleam-chess-tournament
+
+commit c0d5b2dd79084857792f5a23e4509f27d6825c75
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 12:15:42 2025 +0200
+
+    add promotion move generation
+
+commit 332bb8c855cd20c2df15612aa2271551c061cb76
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 12:15:42 2025 +0200
+
+    add promotion move detection
+
+commit fab566719797700cd1dda7e481d069c593da87ae
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 10:20:01 2025 +0200
+
+    update imports
+
+commit 0ac12d6f0fda7cf392620ff441287bdd3631c368
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 10:18:24 2025 +0200
+
+    add move flags + more maybe i'm not sure
+
+commit 6bb69847b78dec859519afa277566294a635e9b0
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 09:28:37 2025 +0200
+
+    fix imports
+
+commit 945ecd18a931743294dde55301aac29599f62f02
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 09:26:05 2025 +0200
+
+    restructure folders
+
+commit 8ec9116d27ec02ed3c4b295c34dca755cd8ae434
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 09:23:21 2025 +0200
+
+    remove unnecessary imports
+
+commit c69ff59ea8d65b1baa303312f94596cf6e9dd086
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 09:22:56 2025 +0200
+
+    fix queen moves not actually being implemented + add pawn moves, captures, en passant
+
+commit 25f8562831a2975f32fe698be0421bbd3fa2a8cf
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 08:00:53 2025 +0200
+
+    add rook and queen moves
+
+commit 7fe2739ad195390647579db792eb0e766fe21d69
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Tue Mar 18 07:56:18 2025 +0200
+
+    finish magic bitboards (i think lol)
+
+commit bdcbe688dfe900346eed934c4fdf0b6f614ca14e
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Mon Mar 17 21:49:22 2025 +0200
+
+    cleanup and formatting
+
+commit f1537b5fe1fb0563c35d7b172f48aa37133b8b06
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Mon Mar 17 21:48:50 2025 +0200
+
+    a lot
+
+commit 785eed2739aa617a6320107b2f95194f3c994c88
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Mon Mar 17 11:46:01 2025 +0200
+
+    remove unnecessary imports
+
+commit e253525aad5ea44f43556c945bfd38803b4330e1
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Mon Mar 17 11:43:55 2025 +0200
+
+    add knight move generation + move displaying
+
+commit bc5b16edd500f7c30df7d7935ef300697edce7a6
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Mon Mar 17 07:39:49 2025 +0200
+
+    initial commit (user)
+
+commit 0a8eeaa318dc2316c523fbd67a936058473fea23
+Author: Luc de Cafmeyer <ldecafmeyer@gmail.com>
+Date:   Sat Mar 15 16:08:53 2025 +0200
+
+    initial commit

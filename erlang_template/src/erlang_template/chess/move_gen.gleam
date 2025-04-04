@@ -33,12 +33,18 @@ pub fn attacks_to(
 
   let blockers = board |> board.all_pieces
   let rook_queen_attacks =
-    move_tables.sliding_targets(square, blockers, move_tables.rook_move_shifts)
+    move_tables.sliding_targets(
+      square,
+      blockers,
+      move_tables.rook_move_shifts,
+      False,
+    )
   let bishop_queen_attacks =
     move_tables.sliding_targets(
       square,
       blockers,
       move_tables.bishop_move_shifts,
+      False,
     )
 
   let attacking_knights = knight_attacks |> int.bitwise_and(knights)
@@ -95,6 +101,7 @@ pub fn square_attacked_by(
       square,
       blockers,
       move_tables.bishop_move_shifts,
+      False,
     )
     |> int.bitwise_and(enemy_diagonals)
   use <- bool.guard(when: diagonals != 0, return: True)
@@ -104,7 +111,12 @@ pub fn square_attacked_by(
   let enemy_horizontals = enemy_rooks |> int.bitwise_or(enemy_queens)
 
   let horizontals =
-    move_tables.sliding_targets(square, blockers, move_tables.rook_move_shifts)
+    move_tables.sliding_targets(
+      square,
+      blockers,
+      move_tables.rook_move_shifts,
+      False,
+    )
     |> int.bitwise_and(enemy_horizontals)
 
   horizontals != 0
@@ -192,6 +204,7 @@ pub fn bishop_moves(
         source,
         blockers,
         move_tables.bishop_move_shifts,
+        False,
       )
       |> int.bitwise_and(not_friendly_pieces)
 
@@ -225,6 +238,7 @@ pub fn rook_moves(
         source,
         blockers,
         move_tables.rook_move_shifts,
+        False,
       )
       |> int.bitwise_and(not_friendly_pieces)
 
@@ -258,6 +272,7 @@ pub fn queen_moves(
         source,
         blockers,
         move_tables.queen_move_shifts,
+        False,
       )
       |> int.bitwise_and(not_friendly_pieces)
 
